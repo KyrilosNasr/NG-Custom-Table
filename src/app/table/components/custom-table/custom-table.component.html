@@ -2,9 +2,9 @@
   <thead>
     <tr>
       <th scope="col"></th>
-      <th *ngFor="let column of columns" scope="col" [attr.data-column]="column" (click)="sortData(column)">
-        {{ column }}
-        <span *ngIf="sortColumn === column">
+      <th class="pointer" *ngFor="let column of columns" scope="col" [attr.data-column]="column.name" (click)="sortData(column)" [class.sortable]="column.sortable">
+        {{ column.name }}
+        <span *ngIf="sortColumn === column.name">
           {{ sortDirection === 'asc' ? '↑' : '↓' }}
         </span>
       </th>
@@ -44,7 +44,7 @@
         </div>
       </td>
       <ng-container *ngFor="let column of columns">
-        <td>{{ ticket[column] }}</td>
+        <td>{{ ticket[column.name] }}</td>
       </ng-container>
     </tr>
   </tbody>

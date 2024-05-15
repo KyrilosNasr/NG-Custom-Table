@@ -10,7 +10,6 @@ import { HttpClient } from '@angular/common/http';
 export class HomeComponent {
 
   ticketData!:TicketDetails[]
-  tableHeaders: string[] = ['Ticket No', 'Title', 'Category', 'Priority', 'Status', 'Date', 'Updated', 'Delivery Time', 'Ticket creator', 'job Number', 'Department', 'Whom'];
 
   constructor(private http: HttpClient){
 
@@ -20,7 +19,7 @@ export class HomeComponent {
   }
   getTableData(){
     this.http.get('assets/data/dummy-data.json')
-    .subscribe((data) => {
+      .subscribe((data) => {
       this.ticketData = data as TicketDetails[]});
   }
 }

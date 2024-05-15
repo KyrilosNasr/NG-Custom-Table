@@ -1,0 +1,51 @@
+<table class="table table-hover table-striped">
+  <thead>
+    <tr>
+      <th scope="col"></th>
+      <th *ngFor="let column of columns" scope="col" [attr.data-column]="column" (click)="sortData(column)">
+        {{ column }}
+        <span *ngIf="sortColumn === column">
+          {{ sortDirection === 'asc' ? '↑' : '↓' }}
+        </span>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let ticket of data">
+      <td>
+        <!-- Action Menu -->
+        <!-- if you want to add icon add it after the span element ;) -->
+        <div class="dropdown">
+          <button class="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-three-dots-vertical"></i>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+            <li class="pointer">
+              <a class="dropdown-item d-flex align-items-center" (click)="accept(ticket)">
+                <span class="text-primary">Accept</span>
+              </a>
+            </li>
+            <li class="pointer">
+              <a class="dropdown-item d-flex align-items-center" (click)="reject(ticket)">
+              <span class="text-danger-emphasis">Reject</span>
+            </a>
+          </li>
+            <li class="pointer">
+              <a class="dropdown-item d-flex align-items-center" (click)="edit(ticket)">
+                <span class="text-success">Edit</span>
+              </a>
+            </li>
+            <li class="pointer">
+              <a class="dropdown-item d-flex align-items-center" (click)="delete(ticket)">
+                <span class="text-danger">Delete</span>
+            </a>
+            </li>
+          </ul>
+        </div>
+      </td>
+      <ng-container *ngFor="let column of columns">
+        <td>{{ ticket[column] }}</td>
+      </ng-container>
+    </tr>
+  </tbody>
+</table>

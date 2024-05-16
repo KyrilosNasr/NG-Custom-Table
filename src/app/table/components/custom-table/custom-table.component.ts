@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { TicketDetails } from '../../interfaces/ticketDetails.interface';
 import { TableCol } from '../../interfaces/table-col.interface';
+import { FormArray, FormBuilder, FormControl, FormGroup } from '@angular/forms';
 
 // interface ColumnDefinition {
 //   name: string;
@@ -20,6 +21,7 @@ import { TableCol } from '../../interfaces/table-col.interface';
 export class CustomTableComponent implements OnChanges{
   @Input() data: any[] = [];
   @Input() columns: TableCol[] = [];
+  selectedTickets: any[] = []; 
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
@@ -81,4 +83,45 @@ export class CustomTableComponent implements OnChanges{
   reject(ticket: TicketDetails) { console.log(`You chose to reject ticket number: ${ticket["Ticket No"]}`); }
   edit(ticket: TicketDetails) { console.log(`You chose to edit ticket number: ${ticket["Ticket No"]}`); }
   delete(ticket: TicketDetails) { console.log(`You chose to delete ticket number: ${ticket["Ticket No"]}`); }
+
+  selectAll(event: Event) {
+    const target = event.target as HTMLInputElement;
+    if (target.checked) {
+      // If the select all checkbox is checked, select all tickets
+      this.selectedTickets = [...this.data];
+      // Update all row checkboxes to be checked
+      this.data.forEach((ticket:TicketDetails) => {
+        const checkbox = document.getElementById('flexCheckDefault' + ticket['Ticket No']) as HTMLInputElement;
+        if (checkbox) {
+          checkbox.checked = true;
+        }
+      });
+    } else {
+      // Otherwise, handle selection as before
+      target.indeterminate = false;
+      if (target.checked) {
+        this.selectedTickets = [...this.data];
+      } else {
+        this.selectedTickets = [];
+      }
+    }
+  }
+
+  isSelected(ticket: TicketDetails): boolean {
+    return this.selectedTickets.some((selectedTicket:TicketDetails) => selectedTicket['Ticket No'] === ticket['Ticket No']);
+  }
+
+  selectTicket(event: Event, ticket: TicketDetails) {
+    const target = event.target as HTMLInputElement;
+    if (target.checked) {
+      this.selectedTickets.push(ticket);
+      console.log(this.selectedTickets);
+      
+    } else {
+      const index = this.selectedTickets.indexOf(ticket);
+      if (index !== -1) {
+        this.selectedTickets.splice(index, 1);
+      }
+    }
+  }
 }

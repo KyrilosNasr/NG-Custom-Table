@@ -1,8 +1,15 @@
 <table class="table table-hover table-striped">
   <thead>
     <tr>
-      <th scope="col"></th>
-      <th class="pointer" *ngFor="let column of columns" scope="col" [attr.data-column]="column.name" (click)="sortData(column)" [class.sortable]="column.sortable">
+      <th scope="col">
+        <input class="form-check-input" type="checkbox" value="" id="selectAllCheckbox" (change)="selectAll($event)"
+          [checked]="selectedTickets.length === data.length && data.length > 0"
+          [indeterminate]="selectedTickets.length > 0 && selectedTickets.length < data.length">
+
+      </th>
+      <th></th>
+      <th class="pointer" *ngFor="let column of columns" scope="col" [attr.data-column]="column.name"
+        (click)="sortData(column)" [class.sortable]="column.sortable">
         {{ column.name }}
         <span *ngIf="sortColumn === column.name">
           {{ sortDirection === 'asc' ? '↑' : '↓' }}
@@ -12,6 +19,10 @@
   </thead>
   <tbody>
     <tr *ngFor="let ticket of data">
+      <td>
+        <input class="form-check-input" type="checkbox" [value]="ticket" [id]="'flexCheckDefault' + ticket['Ticket No']"
+          [checked]="isSelected(ticket)" (change)="selectTicket($event, ticket)">
+      </td>
       <td>
         <!-- Action Menu -->
         <!-- if you want to add icon add it after the span element ;) -->
@@ -27,9 +38,9 @@
             </li>
             <li class="pointer">
               <a class="dropdown-item d-flex align-items-center" (click)="reject(ticket)">
-              <span class="text-danger-emphasis">Reject</span>
-            </a>
-          </li>
+                <span class="text-danger-emphasis">Reject</span>
+              </a>
+            </li>
             <li class="pointer">
               <a class="dropdown-item d-flex align-items-center" (click)="edit(ticket)">
                 <span class="text-success">Edit</span>
@@ -38,7 +49,7 @@
             <li class="pointer">
               <a class="dropdown-item d-flex align-items-center" (click)="delete(ticket)">
                 <span class="text-danger">Delete</span>
-            </a>
+              </a>
             </li>
           </ul>
         </div>

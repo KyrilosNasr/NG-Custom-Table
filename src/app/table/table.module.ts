@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CustomTableComponent } from './components/custom-table/custom-table.component';
+import { ReactiveFormsModule } from '@angular/forms';
 
 
 
@@ -10,6 +11,7 @@ import { CustomTableComponent } from './components/custom-table/custom-table.com
   ],
   imports: [
     CommonModule,
+    ReactiveFormsModule
   ],
   exports:[
     CustomTableComponent

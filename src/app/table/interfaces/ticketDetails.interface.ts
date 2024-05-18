@@ -1,14 +1,21 @@
-export interface TicketDetails {
-    "Ticket No": string;
-    Title: string;
-    Category: string;
-    Priority: string;
-    Status: string;
-    Date: Date;
-    Updated: Date
-    Delivery_Time: string;
-    Ticket_creator: string;
-    job_Number: string;
-    Department: string;
-    Whom: string;
-}
+export interface TicketDetail {
+    value: string | number | Date;
+    sortable: boolean;
+  }
+  export interface Ticket {
+    ticketNo: TicketDetail;
+    title: TicketDetail;
+    category: TicketDetail;
+    priority: TicketDetail;
+    status: TicketDetail;
+    date: TicketDetail;
+    updated: TicketDetail;
+    deliveryTime: TicketDetail;
+    ticketCreator: TicketDetail;
+    jobNumber: TicketDetail;
+    department: TicketDetail;
+    whom: TicketDetail;
+  }
+   export interface TicketList {
+    ticketsList: Ticket[];
+  }

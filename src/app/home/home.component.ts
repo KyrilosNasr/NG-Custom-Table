@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
-import { TicketDetails } from '../table/interfaces/ticketDetails.interface';
 import { HttpClient } from '@angular/common/http';
+import { ticketsList } from 'src/assets/data/dumy-data';
+import { Ticket } from '../table/interfaces/ticketDetails.interface';
 
 @Component({
   selector: 'app-home',
@@ -9,7 +10,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class HomeComponent {
 
-  ticketData!:TicketDetails[]
+  ticketData!:Ticket[]
 
   constructor(private http: HttpClient){
 
@@ -18,8 +19,6 @@ export class HomeComponent {
     this.getTableData()
   }
   getTableData(){
-    this.http.get('assets/data/dummy-data.json')
-      .subscribe((data) => {
-      this.ticketData = data as TicketDetails[]});
+    this.ticketData = ticketsList;
   }
 }

@@ -55,7 +55,7 @@
         </div>
       </td>
       <ng-container *ngFor="let column of columns">
-        <td>{{ ticket[column.name] }}</td>
+        <td>{{ ticket[column.name].value | smartFormat }}</td>
       </ng-container>
     </tr>
   </tbody>

@@ -9,9 +9,10 @@ import { PaginationConfig } from '../../interfaces/PaginationConfig.interface';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class CustomTableComponent implements OnChanges{
+export class CustomTableComponent implements OnChanges {
   @Input() data: any[] = [];
-  @Input() paginationConfig: PaginationConfig = { rowsPerPage: 5, currentPage: 1 }; // Receive pagination config from parent
+  @Input() paginationConfig: PaginationConfig = { rowsPerPage: 5, currentPage: 1 };
+  removedColumns: { name: string, index: number }[] = [];
   columns: TicketCols[] = [];
   selectedTickets: any[] = [];
   sortColumn: string = '';
@@ -21,7 +22,7 @@ export class CustomTableComponent implements OnChanges{
   totalPages: number = 0;
   rowsPerPageOptions: number[] = [2, 3, 4, 5];
 
-  constructor(private cd: ChangeDetectorRef) {}
+  constructor(private cd: ChangeDetectorRef) { }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['data'] && this.data && this.data.length > 0) {
@@ -128,4 +129,48 @@ export class CustomTableComponent implements OnChanges{
   jumpToLastPage() {
     this.onPageChange(this.totalPages);
   }
+  onDragStart(event: DragEvent, column: any) {
+    event.dataTransfer?.setData('text/plain', column.name);
   }
+
+  allowDrop(event: DragEvent) {
+    event.preventDefault();
+  }
+
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    // Get the dropped column data
+    const columnName = event.dataTransfer?.getData('text/plain');
+    // Set the removed column data
+    const columnIndex = this.columns.findIndex(column => column.name === columnName);
+
+    if (columnIndex !== -1 && columnName) {
+      this.removedColumns.push({ name: columnName, index: columnIndex });
+    }
+    this.columns = this.columns.filter(column => column.name !== columnName);
+  }
+
+  restoreColumn(columnName: string) {
+    // Find the removed column object by name
+    const removedColumn = this.removedColumns.find(column => column.name === columnName);
+    if (removedColumn) {
+      // Add the removed column back to the 'columns' array at its original position
+      this.columns.splice(removedColumn.index, 0, { name: columnName, sortable: true });
+      // Remove the restored column from the list of removed columns
+      this.removedColumns = this.removedColumns.filter(column => column.name !== columnName);
+    }
+  }
+
+  restoreAllColumns() {
+    // Restore each removed column back to its original position in the 'columns' array
+    this.removedColumns.forEach(removedColumn => {
+      const { name, index } = removedColumn;
+      if (!this.columns.find(column => column.name === name)) {
+        this.columns.splice(index, 0, { name, sortable: true });
+      }
+    });
+    // Clear the removed columns array
+    this.removedColumns = [];
+  }
+
+}

@@ -1,4 +1,24 @@
+<div class="d-flex align-items-center justify-content-around my-5">
+  <!-- Drag and drop area -->
+  <div class="drag-drop-area border border-danger p-3 w-50 text-center" (drop)="onDrop($event)" (dragover)="allowDrop($event)">
+    Drag and drop here 
+  </div>
+  
+  <!-- Display removed column names as clickable elements -->
+  <div *ngIf="removedColumns.length" class="removed-column d-flex justify-content-between align-items-center flex-column">
+    <h2> Removed Columns</h2>
+    <div class="d-flex align-items-center gap-3">
+      <!-- Loop through removed columns and display them as clickable elements -->
+      <div *ngFor="let item of removedColumns" class="pointer">
+        <span class="bg-success rounded-pill px-3 d-flex align-items-center text-capitalize py-2 text-white" (click)="restoreColumn(item.name)">{{ item.name }} <i class="bi bi-x ms-2"></i></span>
+      </div>
+      <button class="btn btn-primary" (click)="restoreAllColumns()">Restore All <i class="bi bi-arrow-repeat"></i></button>
+    </div>
+  </div>
+</div>
+
 <table class="table table-hover table-striped">
+  <!-- Table Header -->
   <thead>
     <tr>
       <th scope="col">
@@ -7,8 +27,10 @@
           [indeterminate]="selectedTickets.length > 0 && selectedTickets.length < data.length">
       </th>
       <th></th>
-      <th class="pointer" *ngFor="let column of columns" scope="col" [attr.data-column]="column.name"
-        (click)="sortData(column)" [class.sortable]="column.sortable">
+      <!-- Iterate over columns -->
+      <th class="pointer text-capitalize" *ngFor="let column of columns" scope="col" [attr.data-column]="column.name"
+        (click)="sortData(column)" [class.sortable]="column.sortable"
+        draggable="true" (dragstart)="onDragStart($event, column)">
         {{ column.name }}
         <span *ngIf="sortColumn === column.name">
           {{ sortDirection === 'asc' ? '↑' : '↓' }}

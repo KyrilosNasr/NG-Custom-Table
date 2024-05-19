@@ -2,10 +2,9 @@
   <thead>
     <tr>
       <th scope="col">
-        <input class="form-check-input" type="checkbox" value="" id="selectAllCheckbox" (change)="selectAll($event)"
+        <input class="form-check-input" type="checkbox" id="selectAllCheckbox" (change)="selectAll($event)"
           [checked]="selectedTickets.length === data.length && data.length > 0"
           [indeterminate]="selectedTickets.length > 0 && selectedTickets.length < data.length">
-
       </th>
       <th></th>
       <th class="pointer" *ngFor="let column of columns" scope="col" [attr.data-column]="column.name"
@@ -18,14 +17,13 @@
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let ticket of data">
+    <tr *ngFor="let ticket of paginatedData">
       <td>
-        <input class="form-check-input" type="checkbox" [value]="ticket" [id]="'flexCheckDefault' + ticket['Ticket No']"
-          [checked]="isSelected(ticket)" (change)="selectTicket($event, ticket)">
+        <input class="form-check-input" type="checkbox" [value]="ticket"
+          [id]="'flexCheckDefault' + ticket.ticketNo.value" [checked]="isSelected(ticket)"
+          (change)="selectTicket($event, ticket)">
       </td>
       <td>
-        <!-- Action Menu -->
-        <!-- if you want to add icon add it after the span element ;) -->
         <div class="dropdown">
           <button class="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-three-dots-vertical"></i>
@@ -60,3 +58,48 @@
     </tr>
   </tbody>
 </table>
+
+<div class="d-flex align-items-center justify-content-around flex-row mt-5">
+  <nav *ngIf="data.length > paginationConfig.rowsPerPage">
+    <ul class="pagination justify-content-center">
+      <!-- Jump to First Page Button -->
+      <li class="page-item" [class.disabled]="paginationConfig.currentPage === 1">
+        <a class="page-link" href="#" (click)="jumpToFirstPage()" aria-label="First">
+          <span aria-hidden="true">&laquo;&laquo;</span>
+        </a>
+      </li>
+      <!-- Previous Page Button -->
+      <li class="page-item" [class.disabled]="paginationConfig.currentPage === 1">
+        <a class="page-link" href="#" (click)="onPageChange(paginationConfig.currentPage - 1)" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      <!-- Page Numbers -->
+      <li class="page-item" *ngFor="let page of pages" [class.active]="paginationConfig.currentPage === page">
+        <a class="page-link" href="#" (click)="onPageChange(page)">{{ page }}</a>
+      </li>
+      <!-- Next Page Button -->
+      <li class="page-item" [class.disabled]="paginationConfig.currentPage === totalPages">
+        <a class="page-link" href="#" (click)="onPageChange(paginationConfig.currentPage + 1)" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      <!-- Jump to Last Page Button -->
+      <li class="page-item" [class.disabled]="paginationConfig.currentPage === totalPages">
+        <a class="page-link" href="#" (click)="jumpToLastPage()" aria-label="Last">
+          <span aria-hidden="true">&raquo;&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="row w-25">
+    <div class="col-md-6 d-flex flex-row gap-3 justify-content-around align-items-center w-100">
+      <label for="rowsPerPage">Rows Per Page:</label>
+      <select class="form-select w-50" id="rowsPerPage" [(ngModel)]="paginationConfig.rowsPerPage"
+        (change)="onRowsPerPageChange()">
+        <option *ngFor="let option of rowsPerPageOptions" [value]="option">{{ option }}</option>
+      </select>
+    </div>
+  </div>
+</div>

@@ -1,4 +1,5 @@
 export interface TicketCols{
     name:string;
-    sortable:boolean
+    sortable?:boolean;
+    dragable?:boolean;
 }

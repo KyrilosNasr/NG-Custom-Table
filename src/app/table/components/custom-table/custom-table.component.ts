@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { TicketCols } from '../../interfaces/ticketCols.interface';
 import { PaginationConfig } from '../../interfaces/PaginationConfig.interface';
+import { Ticket } from '../../interfaces/ticketDetails.interface';
 @Component({
   selector: 'app-custom-table',
   templateUrl: './custom-table.component.html',
@@ -10,19 +11,20 @@ import { PaginationConfig } from '../../interfaces/PaginationConfig.interface';
 })
 
 export class CustomTableComponent implements OnChanges {
-  @Input() data: any[] = [];
+  @Input() data: Ticket[] = [];
   @Input() paginationConfig: PaginationConfig = { rowsPerPage: 5, currentPage: 1 };
+  @Input() columns: TicketCols[] = [];
+
   removedColumns: { name: string, index: number }[] = [];
-  columns: TicketCols[] = [];
-  selectedTickets: any[] = [];
+  selectedTicketsMap: { [page: number]: Ticket[] } = {};
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  paginatedData: any[] = [];
+  paginatedData: Ticket[] = [];
   totalPages: number = 0;
   rowsPerPageOptions: number[] = [2, 3, 4, 5];
 
-  constructor(private cd: ChangeDetectorRef) { }
+  constructor(private cd: ChangeDetectorRef) {}
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['data'] && this.data && this.data.length > 0) {
@@ -33,13 +35,15 @@ export class CustomTableComponent implements OnChanges {
   }
 
   generateColumns() {
-    this.columns = Object.keys(this.data[0]).map(key => ({
-      name: key,
-      sortable: this.data[0][key].sortable
-    }));
+    if (this.data.length > 0) {
+      this.columns = Object.keys(this.data[0]).map(key => ({
+        name: key,
+        sortable: true // Assuming all columns are sortable; adjust if needed
+      }));
+    }
   }
 
-  sortData(column: { name: string; sortable: boolean }) {
+  sortData(column: TicketCols) {
     if (!column.sortable) return;
 
     const columnName = column.name;
@@ -51,8 +55,8 @@ export class CustomTableComponent implements OnChanges {
     }
 
     this.data.sort((a, b) => {
-      const aValue = a[columnName].value;
-      const bValue = b[columnName].value;
+      const aValue = a[columnName as keyof Ticket];
+      const bValue = b[columnName as keyof Ticket];
 
       if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
       if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
@@ -76,46 +80,76 @@ export class CustomTableComponent implements OnChanges {
     this.updatePagination();
   }
 
+  getTicketValue(ticket: Ticket, columnName: string): any {
+    return ticket[columnName as keyof Ticket];
+  }
+
   onRowsPerPageChange() {
     this.paginationConfig.currentPage = 1;
     this.updatePagination();
   }
 
-  // Placeholder methods for row actions
-  accept(ticket: any) { console.log(`You chose to accept ticket number: ${ticket.ticketNo.value}`); }
-  reject(ticket: any) { console.log(`You chose to reject ticket number: ${ticket.ticketNo.value}`); }
-  edit(ticket: any) { console.log(`You chose to edit ticket number: ${ticket.ticketNo.value}`); }
-  delete(ticket: any) { console.log(`You chose to delete ticket number: ${ticket.ticketNo.value}`); }
+  accept(ticket: any) {
+    console.log(`You chose to accept ticket number: ${ticket.ticketNo}`);
+  }
+
+  reject(ticket: any) {
+    console.log(`You chose to reject ticket number: ${ticket.ticketNo}`);
+  }
+
+  edit(ticket: any) {
+    console.log(`You chose to edit ticket number: ${ticket.ticketNo}`);
+  }
+
+  delete(ticket: any) {
+    console.log(`You chose to delete ticket number: ${ticket.ticketNo}`);
+  }
 
   selectAll(event: Event) {
-    const target = event.target as HTMLInputElement;
-    if (target.checked) {
-      this.selectedTickets = [...this.data];
-      this.data.forEach(ticket => {
-        const checkbox = document.getElementById('flexCheckDefault' + ticket.ticketNo.value) as HTMLInputElement;
-        if (checkbox) {
-          checkbox.checked = true;
+    const checkbox = event.target as HTMLInputElement;
+    const currentPage = this.paginationConfig.currentPage;
+    if (!this.selectedTicketsMap[currentPage]) {
+      this.selectedTicketsMap[currentPage] = [];
+    }
+    if (checkbox.checked) {
+      this.paginatedData.forEach(ticket => {
+        if (!this.isSelected(ticket)) {
+          this.selectedTicketsMap[currentPage].push(ticket);
         }
       });
     } else {
-      this.selectedTickets = [];
+      this.selectedTicketsMap[currentPage] = [];
     }
   }
 
-  isSelected(ticket: any): boolean {
-    return this.selectedTickets.some(selectedTicket => selectedTicket.ticketNo.value === ticket.ticketNo.value);
+  isSelected(ticket: Ticket): boolean {
+    const currentPage = this.paginationConfig.currentPage;
+    return this.selectedTicketsMap[currentPage] && this.selectedTicketsMap[currentPage].some(selected => selected.ticketNo === ticket.ticketNo);
   }
 
-  selectTicket(event: Event, ticket: any) {
-    const target = event.target as HTMLInputElement;
-    if (target.checked) {
-      this.selectedTickets.push(ticket);
-    } else {
-      const index = this.selectedTickets.indexOf(ticket);
-      if (index !== -1) {
-        this.selectedTickets.splice(index, 1);
+  selectTicket(event: Event, ticket: Ticket) {
+    const checkbox = event.target as HTMLInputElement;
+    const currentPage = this.paginationConfig.currentPage;
+    if (!this.selectedTicketsMap[currentPage]) {
+      this.selectedTicketsMap[currentPage] = [];
+    }
+    if (checkbox.checked) {
+      if (!this.isSelected(ticket)) {
+        this.selectedTicketsMap[currentPage].push(ticket);
       }
+    } else {
+      this.selectedTicketsMap[currentPage] = this.selectedTicketsMap[currentPage].filter(selected => selected.ticketNo !== ticket.ticketNo);
     }
+  }
+
+  areAllVisibleSelected(): boolean {
+    const currentPage = this.paginationConfig.currentPage;
+    return this.paginatedData.length > 0 && this.paginatedData.every(ticket => this.isSelected(ticket));
+  }
+
+  areSomeVisibleSelected(): boolean {
+    const currentPage = this.paginationConfig.currentPage;
+    return this.paginatedData.some(ticket => this.isSelected(ticket)) && !this.areAllVisibleSelected();
   }
 
   get pages(): number[] {
@@ -129,6 +163,7 @@ export class CustomTableComponent implements OnChanges {
   jumpToLastPage() {
     this.onPageChange(this.totalPages);
   }
+
   onDragStart(event: DragEvent, column: any) {
     event.dataTransfer?.setData('text/plain', column.name);
   }
@@ -139,9 +174,7 @@ export class CustomTableComponent implements OnChanges {
 
   onDrop(event: DragEvent) {
     event.preventDefault();
-    // Get the dropped column data
     const columnName = event.dataTransfer?.getData('text/plain');
-    // Set the removed column data
     const columnIndex = this.columns.findIndex(column => column.name === columnName);
 
     if (columnIndex !== -1 && columnName) {
@@ -151,26 +184,20 @@ export class CustomTableComponent implements OnChanges {
   }
 
   restoreColumn(columnName: string) {
-    // Find the removed column object by name
     const removedColumn = this.removedColumns.find(column => column.name === columnName);
     if (removedColumn) {
-      // Add the removed column back to the 'columns' array at its original position
       this.columns.splice(removedColumn.index, 0, { name: columnName, sortable: true });
-      // Remove the restored column from the list of removed columns
       this.removedColumns = this.removedColumns.filter(column => column.name !== columnName);
     }
   }
 
   restoreAllColumns() {
-    // Restore each removed column back to its original position in the 'columns' array
     this.removedColumns.forEach(removedColumn => {
       const { name, index } = removedColumn;
       if (!this.columns.find(column => column.name === name)) {
         this.columns.splice(index, 0, { name, sortable: true });
       }
     });
-    // Clear the removed columns array
     this.removedColumns = [];
   }
-
 }

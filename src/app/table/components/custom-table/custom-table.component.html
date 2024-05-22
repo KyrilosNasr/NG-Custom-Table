@@ -29,14 +29,18 @@
       </th>
       <th></th>
       <!-- Iterate over columns -->
-      <th class="pointer text-capitalize" *ngFor="let column of columns" scope="col" [attr.data-column]="column.name"
-        (click)="sortData(column)" [class.sortable]="column.sortable"
-        draggable="true" (dragstart)="onDragStart($event, column)">
-        {{ column.name }}
-        <span *ngIf="sortColumn === column.name">
-          {{ sortDirection === 'asc' ? '↑' : '↓' }}
-        </span>
-      </th>
+      <ng-container *ngFor="let column of columns">
+        <th scope="col" [attr.data-column]="column.name"
+          [class.sortable]="column.sortable" [draggable]="column.draggable" (dragstart)="onDragStart($event, column)"
+          (click)="column.sortable !== false && sortData(column)">
+          <span *ngIf="column.visible"
+          [class.pointer]="column.sortable"
+           class="text-capitalize">{{ column.name }}</span>
+          <span *ngIf="column.sortable && sortColumn === column.name">
+            {{ sortDirection === 'asc' ? '↑' : '↓' }}
+          </span>
+        </th>
+      </ng-container>
     </tr>
   </thead>
   <tbody>

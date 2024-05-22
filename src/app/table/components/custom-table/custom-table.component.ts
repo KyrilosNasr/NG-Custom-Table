@@ -28,7 +28,6 @@ export class CustomTableComponent implements OnChanges {
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['data'] && this.data && this.data.length > 0) {
-      this.generateColumns();
       this.updatePagination();
       this.cd.markForCheck();
     }
@@ -38,7 +37,7 @@ export class CustomTableComponent implements OnChanges {
     if (this.data.length > 0) {
       this.columns = Object.keys(this.data[0]).map(key => ({
         name: key,
-        sortable: true // Assuming all columns are sortable; adjust if needed
+        sortable: true // Assuming all columns are sortable; will be adjusted later while working on sorting fix
       }));
     }
   }

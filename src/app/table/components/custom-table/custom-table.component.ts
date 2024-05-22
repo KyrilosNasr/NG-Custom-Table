@@ -33,15 +33,6 @@ export class CustomTableComponent implements OnChanges {
     }
   }
 
-  generateColumns() {
-    if (this.data.length > 0) {
-      this.columns = Object.keys(this.data[0]).map(key => ({
-        name: key,
-        sortable: true // Assuming all columns are sortable; will be adjusted later while working on sorting fix
-      }));
-    }
-  }
-
   sortData(column: TicketCols) {
     if (!column.sortable) return;
 

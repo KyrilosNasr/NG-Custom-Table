@@ -75,16 +75,16 @@ export let ticketsList: Ticket[] = [
 ];
 
 export const columns: TicketCols[] =[
-  { name: 'ticketNo', sortable: true, draggable: true, visible: true },
-  { name: 'title', sortable: true, draggable: true, visible: true },
-  { name: 'category', sortable: false, draggable: true, visible: true },
-  { name: 'priority', sortable: true, draggable: true, visible: true },
-  { name: 'status', sortable: true, draggable: true, visible: true },
-  { name: 'date', sortable: false, draggable: true, visible: true }, // Initially visible
-  { name: 'updated', sortable: false, draggable: false, visible: true }, // Initially hidden
-  { name: 'deliveryTime', sortable: false, draggable: false, visible: true },
-  { name: 'ticketCreator', sortable: true, draggable: true, visible: true },
-  { name: 'jobNumber', sortable: true, draggable: true, visible: true },
-  { name: 'department', sortable: true, draggable: true, visible: true },
-  { name: 'whom', sortable: true, draggable: true, visible: true },
+  { name: 'ticketNo', sortable: true, draggable: true },
+  { name: 'title', sortable: true, draggable: true },
+  { name: 'category', sortable: false, draggable: true },
+  { name: 'priority', sortable: true, draggable: true },
+  { name: 'status', sortable: true, draggable: true },
+  // { name: 'date', sortable: false, draggable: true },
+  // { name: 'updated', sortable: false, draggable: false },
+  // { name: 'deliveryTime', sortable: false, draggable: false },
+  { name: 'ticketCreator', sortable: true, draggable: true },
+  { name: 'jobNumber', sortable: true, draggable: true },
+  { name: 'department', sortable: true, draggable: true },
+  { name: 'whom', sortable: true, draggable: true },
 ];

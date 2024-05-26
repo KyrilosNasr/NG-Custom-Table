@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
 import { RowActions, TableAction, TableColumnDetails } from '../../interfaces/tableCols.interface';
 import { PaginationConfig } from '../../interfaces/PaginationConfig.interface';
-import { v4 as uuidv4 } from 'uuid';
 import { TicketDetails } from '../../interfaces/ticketDetails.interface';
 @Component({
   selector: 'app-custom-table',

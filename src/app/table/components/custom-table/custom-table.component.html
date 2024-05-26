@@ -13,7 +13,7 @@
       <!-- Loop through removed columns and display them as clickable elements -->
       <div *ngFor="let item of removedColumns" class="pointer">
         <span class="bg-success rounded-pill px-3 d-flex align-items-center text-capitalize py-2 text-white"
-          (click)="restoreColumn(item.name)">{{ item.name }} <i class="bi bi-x ms-2"></i></span>
+          (click)="restoreColumn(item.column.name)">{{ item.column.name }} <i class="bi bi-x ms-2"></i></span>
       </div>
       <button class="btn btn-primary" (click)="restoreAllColumns()">Restore All <i
           class="bi bi-arrow-repeat"></i></button>
@@ -22,65 +22,82 @@
 </div>
 
 <table class="table table-hover table-striped">
-  <!-- Table Header -->
   <thead>
     <tr>
       <th scope="col">
         <input class="form-check-input" type="checkbox" id="selectAllCheckbox" (change)="selectAll($event)"
           [checked]="areAllVisibleSelected()" [indeterminate]="areSomeVisibleSelected()">
       </th>
-      <th></th>
-      <!-- Iterate over columns -->
+      <th>
+        <!-- Actions Menu in Table Header -->
+        <div *ngIf="(headerActionsList.length > 0 || getCommonActions().length > 0) && !showCommonActionsOnly" class="dropdown">
+          <button class="btn p-0" type="button" id="bulkActionsMenu" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-three-dots-vertical"></i>
+          </button>
+          <ul class="dropdown-menu" aria-labelledby="bulkActionsMenu">
+            <!-- Render header actions -->
+            <li *ngFor="let action of headerActionsList">
+              <a class="dropdown-item d-flex justify-content-between align-items-center text-capitalize pointer"
+                (click)="performBulkAction(action.id)">
+                <span>{{ action.actionName }}</span>
+                <span class="badge bg-primary">{{ getSelectedRowCount() }}</span>
+              </a>
+            </li>
+            <!-- Render common actions -->
+            <li *ngFor="let action of getCommonActions()">
+              <a class="dropdown-item d-flex justify-content-between align-items-center text-capitalize pointer"
+                (click)="performBulkAction(action.id)">
+                <span>{{ action.name }}</span>
+                <span class="badge bg-primary">{{ action.count }}</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </th>
       <ng-container *ngFor="let column of columns">
-        <th scope="col" [attr.data-column]="column.name" [class.sortable]="column.sortable"
-          [draggable]="column.draggable" (dragstart)="onDragStart($event, column)"
-          (click)="column.sortable !== false && sortData(column)">
-          <span [class.pointer]="column.sortable" class="text-capitalize">{{ column.name }}</span>
-          <span *ngIf="column.sortable && sortColumn === column.name">
-            {{ sortDirection === 'asc' ? '↑' : '↓' }}
+        <th scope="col" [attr.data-column]="column.name" [class.defualt]="column.sortable && !column.draggable"
+          [class.grap]="column.draggable && !column.sortable" [class.copy]="column.sortable  && column.draggable"
+          [class.not-allowed]="!column.sortable  && !column.draggable" [draggable]="column.draggable"
+          (dragstart)="onDragStart($event, column)">
+          <span class="text-capitalize" (click)="sortData(column)">
+            {{ column.name }}
+            <span *ngIf="sortColumn === column.name">
+              <i *ngIf="sortDirection === 'asc'" class="bi bi-arrow-up"></i>
+              <i *ngIf="sortDirection === 'desc'" class="bi bi-arrow-down"></i>
+            </span>
           </span>
         </th>
       </ng-container>
     </tr>
   </thead>
   <tbody>
-    <tr *ngFor="let ticket of paginatedData">
+    <tr *ngFor="let row of paginatedData; index as i ">
       <td>
-        <input class="form-check-input" type="checkbox" [value]="ticket" [id]="'flexCheckDefault' + ticket.ticketNo"
-          [checked]="isSelected(ticket)" (change)="selectTicket($event, ticket)">
+        <input class="form-check-input" type="checkbox" (change)="selectItem($event, row)" [checked]="isSelected(row)">
       </td>
       <td>
         <div class="dropdown">
-          <button class="btn" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+          <button class="btn" type="button" id="actionsMenu{{i}}" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-three-dots-vertical"></i>
           </button>
-          <!-- Dropdown actions can be added here -->
-          <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-            <li class="pointer">
-              <a class="dropdown-item d-flex align-items-center" (click)="accept(ticket)">
-                <span class="text-primary">Accept</span>
-              </a>
-            </li>
-            <li class="pointer">
-              <a class="dropdown-item d-flex align-items-center" (click)="reject(ticket)">
-                <span class="text-danger-emphasis">Reject</span>
-              </a>
-            </li>
-            <li class="pointer">
-              <a class="dropdown-item d-flex align-items-center" (click)="edit(ticket)">
-                <span class="text-success">Edit</span>
-              </a>
-            </li>
-            <li class="pointer">
-              <a class="dropdown-item d-flex align-items-center" (click)="delete(ticket)">
-                <span class="text-danger">Delete</span>
-              </a>
-            </li>
+          <ul class="dropdown-menu" [attr.aria-labelledby]="'actionsMenu' + i ">
+            <ng-container *ngFor="let action of rowActionsList">
+              <li class="pointer" *ngIf="row.allowedActions?.includes(action.id)">
+                <a class="dropdown-item d-flex align-items-center" (click)="performAction(action.id, row)">
+                  <span class="text-capitalize" [class.text-primary]="action.actionName === 'accept'"
+                    [class.text-danger-emphasis]="action.actionName === 'reject'"
+                    [class.text-success]="action.actionName === 'edit'"
+                    [class.text-danger]="action.actionName === 'delete'">
+                    {{ action.actionName }}
+                  </span>
+                </a>
+              </li>
+            </ng-container>
           </ul>
         </div>
       </td>
       <ng-container *ngFor="let column of columns">
-        <td class="text-capitalize">{{ getTicketValue(ticket, column.name) | smartFormat }}</td>
+        <td>{{ getRowValue(row, column.name) | smartFormat}}</td>
       </ng-container>
     </tr>
   </tbody>

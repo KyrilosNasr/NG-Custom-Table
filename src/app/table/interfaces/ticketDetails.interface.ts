@@ -1,9 +1,4 @@
-export interface TicketDetail {
-    value: string | number | Date;
-    sortable?: boolean;
-    dragable?:boolean;
-  }
-  export interface Ticket {
+  export interface TicketDetails {
     ticketNo: number;
     title: string;
     category: string;
@@ -16,12 +11,5 @@ export interface TicketDetail {
     jobNumber: number;
     department: string;
     whom: string;
-  }
-   export interface TicketList {
-    ticketsList: Ticket[];
-  }
-
-  export interface TicketActions {
-    actionName:string;
-    actionLogic:(data:Ticket)=> void;
+    allowedActions?:number[]
   }

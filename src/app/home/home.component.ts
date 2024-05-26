@@ -1,9 +1,8 @@
-import { Component, OnInit } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { columns, ticketsList } from 'src/assets/data/dumy-data';
-import { Ticket, TicketActions } from '../table/interfaces/ticketDetails.interface';
+import { TicketDetails } from '../table/interfaces/ticketDetails.interface';
 import { PaginationConfig } from '../table/interfaces/PaginationConfig.interface';
-import { TicketCols } from '../table/interfaces/ticketCols.interface';
+import { RowActions, TableAction, TableColumnDetails } from '../table/interfaces/tableCols.interface';
 
 @Component({
   selector: 'app-home',
@@ -12,44 +11,70 @@ import { TicketCols } from '../table/interfaces/ticketCols.interface';
 })
 export class HomeComponent {
 
-  ticketData!:Ticket[]
-  cols!:TicketCols[]
+  ticketData!:TicketDetails[]
+  cols!:TableColumnDetails[]
   tableConfig:PaginationConfig = {
-    rowsPerPage: 2, currentPage: 1
+    rowsPerPage: 3, currentPage: 1
   }
   actionsSource = 'allowedActions';
-  actions: TicketActions[] = [
+  colActionsList:TableAction[]=[
     {
+      id:1,
+      actionName:'disable',
+      function:(row:any,rowsList?:any) =>{
+        rowsList?.length ? console.log('Disabled',rowsList): console.log('Disabled',row);
+      }
+    },
+    {
+      id:2,
+      actionName:'enable',
+      function:(row:any,rowsList?:any) =>{
+        rowsList?.length ? console.log('Enabled',rowsList): console.log('Enabled',row);
+      }
+    },
+  ];
+  
+  rowActionsList: RowActions[] = [
+    {
+      id:1,
       actionName:'accept',
-      actionLogic:(ticket:Ticket) =>{
-        console.log('accept',ticket);
-        
+      actionLogic:(row:any,rowsList?:any) =>{
+        rowsList?.length ? console.log('accept',rowsList): console.log('accept',row);
       }
     },
     {
-      actionName:'reject',
-      actionLogic:(ticket:Ticket) =>{
-        console.log('reject',ticket);
-        
-      }
-    },
-    {
+      id:2,
       actionName:'delete',
-      actionLogic:(ticket:Ticket) =>{
-        console.log('delete',ticket);
+      actionLogic:(row:any,rowsList?:any) =>{
+        rowsList?.length ? console.log('reject',rowsList): console.log('reject',row);
+      }
+    },
+    {
+      id:3,
+      actionName:'delete',
+      actionLogic:(row:any,rowsList?:any) =>{
+        rowsList?.length ? console.log('delete',rowsList): console.log('delete',row);
         
       }
     },
     {
+      id:4,
       actionName:'view',
-      actionLogic:(ticket:Ticket) =>{
-        console.log('view',ticket);
+      actionLogic:(row:any,rowsList?:any) =>{
+        rowsList?.length ? console.log('view',rowsList): console.log('view',row);
+        
+      }
+    },
+    {
+      id:5,
+      actionName:'edit',
+      actionLogic:(row:any,rowsList?:any) =>{
+        rowsList?.length ? console.log('edit',rowsList): console.log('edit',row);
         
       }
     }
-    // Define your actions here
   ];
-  constructor(private http: HttpClient){
+  constructor(){
   }
   ngOnInit(): void {
     this.getTableData();
@@ -59,8 +84,6 @@ export class HomeComponent {
     this.ticketData = ticketsList;
   }
   getTableCols(){
-    this.cols = columns;
-    console.log(this.cols);
-    
+    this.cols = columns;    
   }
 }

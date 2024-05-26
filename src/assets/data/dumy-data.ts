@@ -1,9 +1,9 @@
-import { TicketCols } from "src/app/table/interfaces/ticketCols.interface";
-import { Ticket } from "src/app/table/interfaces/ticketDetails.interface";
+import { TableColumnDetails } from "src/app/table/interfaces/tableCols.interface";
+import { TicketDetails } from "src/app/table/interfaces/ticketDetails.interface";
 
-export let ticketsList: Ticket[] = [
+export let ticketsList: TicketDetails[] = [
   {
-    ticketNo: 9190,
+    ticketNo: 9191,
     title: 'منتم',
     category: 'Air',
     priority: 'Normal',
@@ -15,6 +15,7 @@ export let ticketsList: Ticket[] = [
     jobNumber: 7007777,
     department: 'Technical',
     whom: 'Mai abd ellatif',
+    allowedActions:[1,2,3,4,5]
   },
   {
     ticketNo: 1010502,
@@ -29,6 +30,7 @@ export let ticketsList: Ticket[] = [
     jobNumber: 7007777,
     department: "Technical",
     whom: "Stock",
+    allowedActions:[3,5]
   },
   {
     ticketNo: 9190,
@@ -43,6 +45,7 @@ export let ticketsList: Ticket[] = [
     jobNumber: 7007777,
     department: "Technical",
     whom: "Mai abd ellatif",
+    allowedActions:[4,2]
   },
   {
     ticketNo: 17553,
@@ -57,6 +60,7 @@ export let ticketsList: Ticket[] = [
     jobNumber: 7007777,
     department: "Technical",
     whom: "Mai abd ellatif",
+    allowedActions:[1,3,4]
   },
   {
     ticketNo: 17568,
@@ -71,20 +75,21 @@ export let ticketsList: Ticket[] = [
     jobNumber: 3003333,
     department: "Technical",
     whom: "Mai abd ellatif",
+    allowedActions:[1,3,4,5]
   }
 ];
 
-export const columns: TicketCols[] =[
-  { name: 'ticketNo', sortable: true, draggable: true },
-  { name: 'title', sortable: true, draggable: true },
-  { name: 'category', sortable: false, draggable: true },
-  { name: 'priority', sortable: true, draggable: true },
-  { name: 'status', sortable: true, draggable: true },
-  // { name: 'date', sortable: false, draggable: true },
-  // { name: 'updated', sortable: false, draggable: false },
-  // { name: 'deliveryTime', sortable: false, draggable: false },
-  { name: 'ticketCreator', sortable: true, draggable: true },
-  { name: 'jobNumber', sortable: true, draggable: true },
-  { name: 'department', sortable: true, draggable: true },
-  { name: 'whom', sortable: true, draggable: true },
+export const columns: TableColumnDetails[] =[
+  { name: 'Number', rowDetail:'ticketNo', sortable: false, draggable: true },
+  { name: 'title',  rowDetail:'title',sortable: true, draggable: true },
+  { name: 'category',  rowDetail:'category',sortable: true, draggable: false },
+  { name: 'priority',  rowDetail:'priority',sortable: true, draggable: true },
+  { name: 'status',  rowDetail:'status',sortable: true, draggable: true },
+  { name: 'date', rowDetail:'date', sortable: false, draggable: true },
+  { name: 'updated', rowDetail:'updated', sortable: false, draggable: false },
+  { name: 'deliveryTime',  rowDetail:'deliveryTime', sortable: false, draggable: false },
+  { name: 'ticketCreator',  rowDetail:'ticketCreator',sortable: false, draggable: false },
+  { name: 'jobNumber',  rowDetail:'jobNumber',sortable: true, draggable: true },
+  { name: 'department',  rowDetail:'department',sortable: true, draggable: true },
+  { name: 'whom',  rowDetail:'whom',sortable: true, draggable: true },
 ];

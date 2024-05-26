@@ -1,9 +1,10 @@
 <div *ngIf="ticketData && ticketData.length > 0" class="d-flex justify-content-center align-items-center h-100 mt-5">
-    <app-custom-table [data]="ticketData" [paginationConfig]="tableConfig" [columns]="cols"></app-custom-table>
+    <app-custom-table [data]="ticketData" [paginationConfig]="tableConfig" [headerActionsList]="colActionsList" [rowActionsList]="rowActionsList" [actionsKey]="actionsSource" [columns]="cols"></app-custom-table>
 </div>
 
 
-<div *ngIf="ticketData === undefined" class="alert alert-danger d-flex flex-column align-items-center justify-content-center mt-5" role="alert">
+<div *ngIf="ticketData === undefined"
+class="alert alert-danger d-flex flex-column align-items-center justify-content-center mt-5" role="alert">
         <div>
             <i class="bi bi-exclamation-triangle-fill px-3 fs-3"></i>
         </div>

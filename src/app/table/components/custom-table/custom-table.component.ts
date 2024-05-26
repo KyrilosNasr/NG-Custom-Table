@@ -1,8 +1,8 @@
-import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { TicketCols } from '../../interfaces/ticketCols.interface';
+import { RowActions, TableAction, TableColumnDetails } from '../../interfaces/tableCols.interface';
 import { PaginationConfig } from '../../interfaces/PaginationConfig.interface';
-import { Ticket } from '../../interfaces/ticketDetails.interface';
+import { v4 as uuidv4 } from 'uuid';
+import { TicketDetails } from '../../interfaces/ticketDetails.interface';
 @Component({
   selector: 'app-custom-table',
   templateUrl: './custom-table.component.html',
@@ -11,31 +11,38 @@ import { Ticket } from '../../interfaces/ticketDetails.interface';
 })
 
 export class CustomTableComponent implements OnChanges {
-  @Input() data: Ticket[] = [];
+  @Input() data: TicketDetails[] = [];
   @Input() paginationConfig: PaginationConfig = { rowsPerPage: 5, currentPage: 1 };
-  @Input() columns: TicketCols[] = [];
+  @Input() columns: TableColumnDetails[] = [];
+  @Input() actionsKey!: string;
+  @Input() rowActionsList!: RowActions[];
+  @Input() headerActionsList!: TableAction[];
 
-  removedColumns: { name: string, index: number }[] = [];
-  selectedTicketsMap: { [page: number]: Ticket[] } = {};
+  // To handle cases without a specific identifier key
+  generatedIdKey: string = '__generatedId';
+
+  removedColumns: { column: TableColumnDetails, index: number }[] = [];
+  selectedRowsMap: { [page: number]: any[] } = {};
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
-  paginatedData: Ticket[] = [];
+  showCommonActionsOnly: boolean = false;
+  paginatedData: any[] = [];
   totalPages: number = 0;
   rowsPerPageOptions: number[] = [2, 3, 4, 5];
 
-  constructor(private cd: ChangeDetectorRef) {}
+  constructor(private cd: ChangeDetectorRef) { }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes['data'] && this.data && this.data.length > 0) {
       this.updatePagination();
       this.cd.markForCheck();
     }
+    this.updateShowCommonActionsOnly();
   }
 
-  sortData(column: TicketCols) {
+  sortData(column: TableColumnDetails) {
     if (!column.sortable) return;
-
     const columnName = column.name;
     if (this.sortColumn === columnName) {
       this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
@@ -45,16 +52,18 @@ export class CustomTableComponent implements OnChanges {
     }
 
     this.data.sort((a, b) => {
-      const aValue = a[columnName as keyof Ticket];
-      const bValue = b[columnName as keyof Ticket];
-
-      if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
-      if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
+      const aValue = a[columnName as keyof TicketDetails];
+      const bValue = b[columnName as keyof TicketDetails];
+      if (aValue && bValue) {
+        if (aValue < bValue) return this.sortDirection === 'asc' ? -1 : 1;
+        if (aValue > bValue) return this.sortDirection === 'asc' ? 1 : -1;
+      }
       return 0;
     });
 
     this.updatePagination();
   }
+  // pagination
 
   updatePagination() {
     this.totalPages = Math.ceil(this.data.length / this.paginationConfig.rowsPerPage);
@@ -70,76 +79,9 @@ export class CustomTableComponent implements OnChanges {
     this.updatePagination();
   }
 
-  getTicketValue(ticket: Ticket, columnName: string): any {
-    return ticket[columnName as keyof Ticket];
-  }
-
   onRowsPerPageChange() {
     this.paginationConfig.currentPage = 1;
     this.updatePagination();
-  }
-
-  accept(ticket: any) {
-    console.log(`You chose to accept ticket number: ${ticket.ticketNo}`);
-  }
-
-  reject(ticket: any) {
-    console.log(`You chose to reject ticket number: ${ticket.ticketNo}`);
-  }
-
-  edit(ticket: any) {
-    console.log(`You chose to edit ticket number: ${ticket.ticketNo}`);
-  }
-
-  delete(ticket: any) {
-    console.log(`You chose to delete ticket number: ${ticket.ticketNo}`);
-  }
-
-  selectAll(event: Event) {
-    const checkbox = event.target as HTMLInputElement;
-    const currentPage = this.paginationConfig.currentPage;
-    if (!this.selectedTicketsMap[currentPage]) {
-      this.selectedTicketsMap[currentPage] = [];
-    }
-    if (checkbox.checked) {
-      this.paginatedData.forEach(ticket => {
-        if (!this.isSelected(ticket)) {
-          this.selectedTicketsMap[currentPage].push(ticket);
-        }
-      });
-    } else {
-      this.selectedTicketsMap[currentPage] = [];
-    }
-  }
-
-  isSelected(ticket: Ticket): boolean {
-    const currentPage = this.paginationConfig.currentPage;
-    return this.selectedTicketsMap[currentPage] && this.selectedTicketsMap[currentPage].some(selected => selected.ticketNo === ticket.ticketNo);
-  }
-
-  selectTicket(event: Event, ticket: Ticket) {
-    const checkbox = event.target as HTMLInputElement;
-    const currentPage = this.paginationConfig.currentPage;
-    if (!this.selectedTicketsMap[currentPage]) {
-      this.selectedTicketsMap[currentPage] = [];
-    }
-    if (checkbox.checked) {
-      if (!this.isSelected(ticket)) {
-        this.selectedTicketsMap[currentPage].push(ticket);
-      }
-    } else {
-      this.selectedTicketsMap[currentPage] = this.selectedTicketsMap[currentPage].filter(selected => selected.ticketNo !== ticket.ticketNo);
-    }
-  }
-
-  areAllVisibleSelected(): boolean {
-    const currentPage = this.paginationConfig.currentPage;
-    return this.paginatedData.length > 0 && this.paginatedData.every(ticket => this.isSelected(ticket));
-  }
-
-  areSomeVisibleSelected(): boolean {
-    const currentPage = this.paginationConfig.currentPage;
-    return this.paginatedData.some(ticket => this.isSelected(ticket)) && !this.areAllVisibleSelected();
   }
 
   get pages(): number[] {
@@ -153,8 +95,58 @@ export class CustomTableComponent implements OnChanges {
   jumpToLastPage() {
     this.onPageChange(this.totalPages);
   }
+  
+  // single and multi select
+  selectAll(event: Event) {
+    const checkbox = event.target as HTMLInputElement;
+    const currentPage = this.paginationConfig.currentPage;
+    if (!this.selectedRowsMap[currentPage]) {
+      this.selectedRowsMap[currentPage] = [];
+    }
+    if (checkbox.checked) {
+      this.paginatedData.forEach(item => {
+        if (!this.isSelected(item)) {
+          this.selectedRowsMap[currentPage].push(item);
+        }
+      });
+    } else {
+      this.selectedRowsMap[currentPage] = [];
+    }
+    this.cd.markForCheck();
+  }
 
-  onDragStart(event: DragEvent, column: any) {
+  isSelected(item: any): boolean {
+    const currentPage = this.paginationConfig.currentPage;
+    return this.selectedRowsMap[currentPage]?.some(selected => selected.ticketNo === item.ticketNo) || false;
+  }
+  
+  selectItem(event: Event, item: any) {
+    const checkbox = event.target as HTMLInputElement;
+    const currentPage = this.paginationConfig.currentPage;
+    if (!this.selectedRowsMap[currentPage]) {
+      this.selectedRowsMap[currentPage] = [];
+    }
+    if (checkbox.checked) {
+      if (!this.isSelected(item)) {
+        this.selectedRowsMap[currentPage].push(item);
+      }
+    } else {
+      this.selectedRowsMap[currentPage] = this.selectedRowsMap[currentPage].filter(selected => selected.ticketNo !== item.ticketNo);
+    }
+    this.cd.markForCheck();
+  }
+
+  areAllVisibleSelected(): boolean {
+    return this.paginatedData.length > 0 && this.paginatedData.every(row => this.isSelected(row));
+  }
+
+  areSomeVisibleSelected(): boolean {
+    return this.paginatedData.some(row => this.isSelected(row)) && !this.areAllVisibleSelected();
+  }
+
+  // drag & drop
+
+  onDragStart(event: DragEvent, column: TableColumnDetails) {
     event.dataTransfer?.setData('text/plain', column.name);
   }
 
@@ -168,26 +160,114 @@ export class CustomTableComponent implements OnChanges {
     const columnIndex = this.columns.findIndex(column => column.name === columnName);
 
     if (columnIndex !== -1 && columnName) {
-      this.removedColumns.push({ name: columnName, index: columnIndex });
+      const column = this.columns[columnIndex];
+      this.removedColumns.push({ column, index: columnIndex });
+      this.columns = this.columns.filter(col => col.name !== columnName);
     }
-    this.columns = this.columns.filter(column => column.name !== columnName);
   }
 
   restoreColumn(columnName: string) {
-    const removedColumn = this.removedColumns.find(column => column.name === columnName);
+    const removedColumn = this.removedColumns.find(column => column.column.name === columnName);
     if (removedColumn) {
-      this.columns.splice(removedColumn.index, 0, { name: columnName, sortable: true });
-      this.removedColumns = this.removedColumns.filter(column => column.name !== columnName);
+      this.columns.splice(removedColumn.index, 0, removedColumn.column);
+      this.removedColumns = this.removedColumns.filter(column => column.column.name !== columnName);
     }
   }
 
   restoreAllColumns() {
     this.removedColumns.forEach(removedColumn => {
-      const { name, index } = removedColumn;
-      if (!this.columns.find(column => column.name === name)) {
-        this.columns.splice(index, 0, { name, sortable: true });
+      const { column, index } = removedColumn;
+      if (!this.columns.find(col => col.name === column.name)) {
+        this.columns.splice(index, 0, column);
       }
     });
     this.removedColumns = [];
+  }
+
+  getRowValue(row: TicketDetails, columnName: string): any {
+    const column = this.columns.find(col => col.name === columnName);
+    if (column) {
+      return row[column.rowDetail as keyof typeof row];
+    }
+    return null; // Handle the case where the column is not found
+  }
+
+  updateShowCommonActionsOnly() {
+    const currentPage = this.paginationConfig.currentPage;
+    const selectedRows = this.selectedRowsMap[currentPage] || [];
+  
+    if (selectedRows.length > 1) {
+      // Check if there are common actions applicable to all selected rows
+      const commonActions = this.getCommonActions();
+      this.showCommonActionsOnly = commonActions.length > 0;
+    } else {
+      this.showCommonActionsOnly = false; // Reset if less than 2 rows are selected
+    }
+  }
+  performAction(actionId: number, item: any) {
+    const action = this.rowActionsList.find(a => a.id === actionId);
+    if (action && action.actionLogic) {
+      action.actionLogic(item);
+    } else {
+      console.error(`Action with id ${actionId} not found.`);
+    }
+  }
+
+  getSelectedRowCount(): number {
+    const currentPage = this.paginationConfig.currentPage;
+    const selectedRows = this.selectedRowsMap[currentPage] || [];
+    return selectedRows.length;
+  }
+  
+  getCommonActions(): { id: number, name: string, count: number }[] {
+    const currentPage = this.paginationConfig.currentPage;
+    const selectedRows = this.selectedRowsMap[currentPage] || [];
+    if (selectedRows.length < 2) return [];
+  
+    const actionCounts: { [id: number]: number } = {};
+    selectedRows.forEach((row) => {
+      if (row.allowedActions) {
+        row.allowedActions.forEach((actionId: number) => {
+          if (!actionCounts[actionId]) {
+            actionCounts[actionId] = 0;
+          }
+          actionCounts[actionId]++;
+        });
+      }
+    });
+  
+    const commonActions: { id: number, name: string, count: number }[] = [];
+    const processedActions: Set<number> = new Set();
+  
+    const allActions = [...this.headerActionsList, ...this.rowActionsList];
+  
+    allActions.forEach(action => {
+      if (actionCounts[action.id] === selectedRows.length && !processedActions.has(action.id)) {
+        commonActions.push({ id: action.id, name: action.actionName || '', count: actionCounts[action.id] || 0 });
+        processedActions.add(action.id);
+      }
+    });
+  
+    return commonActions;
+  }
+  
+
+  performBulkAction(actionId: number) {
+    const currentPage = this.paginationConfig.currentPage;
+    const selectedRows = this.selectedRowsMap[currentPage] || [];
+
+    const action = this.headerActionsList.find(a => a.id === actionId) || this.rowActionsList.find(a => a.id === actionId);
+
+    if (action) {
+      if ('function' in action && typeof action.function === 'function') {
+        action.function(selectedRows);
+      } else if ('actionLogic' in action && typeof action.actionLogic === 'function') {
+        action.actionLogic(selectedRows);
+      } else {
+        console.error(`Action with id ${actionId} has no valid logic.`);
+      }
+    } else {
+      console.error(`Action with id ${actionId} not found.`);
+    }
   }
 }

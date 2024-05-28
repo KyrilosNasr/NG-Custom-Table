@@ -1,5 +1,5 @@
-import { TableColumnDetails } from "src/app/table/interfaces/tableCols.interface";
-import { TicketDetails } from "src/app/table/interfaces/ticketDetails.interface";
+import { TableColumnDetails } from "src/app/table/interfaces/table-details.interface";
+import { TicketDetails } from "src/app/table/interfaces/ticket-details.interface";
 
 export let ticketsList: TicketDetails[] = [
   {
@@ -15,14 +15,14 @@ export let ticketsList: TicketDetails[] = [
     jobNumber: 7007777,
     department: 'Technical',
     whom: 'Mai abd ellatif',
-    allowedActions:[1,2,3,4,5]
+    stateId:1
   },
   {
     ticketNo: 1010502,
     title: "بلاغ اطلب",
     category: "cleaning",
     priority: "Normal",
-    status: "in Progress",
+    status: "Pending",
     date: new Date("2024-04-26"),
     updated: new Date("2024-05-11"),
     deliveryTime: new Date('1970-01-01T13:00:00'),
@@ -30,14 +30,14 @@ export let ticketsList: TicketDetails[] = [
     jobNumber: 7007777,
     department: "Technical",
     whom: "Stock",
-    allowedActions:[3,5]
+    stateId:2
   },
   {
     ticketNo: 9190,
     title: "منتم",
     category: "Air",
     priority: "Normal",
-    status: "In Progress",
+    status: "Closed",
     date: new Date('2023-12-17'),
     updated: new Date('2024-04-30'),
     deliveryTime: new Date('1970-01-01T00:05:00'),
@@ -45,7 +45,7 @@ export let ticketsList: TicketDetails[] = [
     jobNumber: 7007777,
     department: "Technical",
     whom: "Mai abd ellatif",
-    allowedActions:[4,2]
+    stateId:3
   },
   {
     ticketNo: 17553,
@@ -60,7 +60,7 @@ export let ticketsList: TicketDetails[] = [
     jobNumber: 7007777,
     department: "Technical",
     whom: "Mai abd ellatif",
-    allowedActions:[1,3,4]
+    stateId:4
   },
   {
     ticketNo: 17568,
@@ -75,7 +75,7 @@ export let ticketsList: TicketDetails[] = [
     jobNumber: 3003333,
     department: "Technical",
     whom: "Mai abd ellatif",
-    allowedActions:[1,3,4,5]
+    stateId:1
   }
 ];
 

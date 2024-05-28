@@ -11,7 +11,11 @@
     "Ticket creator": "Mohammed",
     "job Number": "8000008",
     "Department": "Technical",
-    "Whom": "Stock"
+    "Whom": "Stock",
+    "actions":[
+      { "name": "Accept", "logic":" () => console.log('Ticket accepted!')" },
+      { "name": "Reject", "logic": "() => console.log('Ticket rejected!')" }
+    ]
   },
   {
     "Ticket No": "1010502",
@@ -25,7 +29,12 @@
     "Ticket creator": "مراجع 2222",
     "job Number": "7007777",
     "Department": "Technical",
-    "Whom": "Stock"
+    "Whom": "Stock",
+    "actions":[
+      { "name": "Accept", "logic":" () => console.log('Ticket accepted!')" },
+      { "name": "Reject", "logic": "() => console.log('Ticket rejected!')" },
+      {"name":"Edit","logic":" () => console.log('Ticket is editing!')"}
+    ]
   },
   {
     "Ticket No": "9190",
@@ -39,7 +48,11 @@
     "Ticket creator": "Mai abd ellatif",
     "job Number": "7007777",
     "Department": "Technical",
-    "Whom": "Mai abd ellatif"
+    "Whom": "Mai abd ellatif",
+    "actions":[
+      { "name": "Accept", "logic":" () => console.log('Ticket accepted!')" },
+      { "name": "Delete", "logic": "() => console.log('Ticket rejected!')" }
+    ]
   },
   {
     "Ticket No": "17553",
@@ -53,7 +66,12 @@
     "Ticket creator": "Mai abd ellatif",
     "job Number": "7007777",
     "Department": "Technical",
-    "Whom": "Mai abd ellatif"
+    "Whom": "Mai abd ellatif",
+    "actions":[
+      { "name": "Accept", "logic":" () => console.log('Ticket accepted!')" },
+      { "name": "Reject", "logic": "() => console.log('Ticket rejected!')" },
+      {"name":"Edit","logic":" () => console.log('Ticket is editing!')"}
+    ]
   },
   {
     "Ticket No": "17568",
@@ -95,7 +113,8 @@
     "Ticket creator": "Hussein Ali",
     "job Number": "3003333",
     "Department": "Technical",
-    "Whom": "Mai abd ellatif"
+    "Whom": "Mai abd ellatif",
+    "actions":["Accept","Reject"]
   }, {
     "Ticket No": "17515",
     "Title": "Another Ticket Title",
@@ -108,6 +127,10 @@
     "Ticket creator": "John Doe",
     "job Number": "1234567",
     "Department": "Marketing",
-    "Whom": "Jane Doe"
+    "Whom": "Jane Doe",
+    "actions":[
+      { "name": "Accept", "logic":" () => console.log('Ticket accepted!')" },
+      { "name": "Assign Technician", "logic": "() => console.log('Ticket assigned to technician!')" }
+    ]
   }
 ]

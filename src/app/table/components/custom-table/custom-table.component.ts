@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, Input, OnChanges, SimpleChanges } from '@angular/core';
-import { RowActions, TableAction, TableColumnDetails } from '../../interfaces/tableCols.interface';
+import { TableActionsDetails, TableColumnDetails } from '../../interfaces/table-details.interface';
 import { PaginationConfig } from '../../interfaces/PaginationConfig.interface';
-import { TicketDetails } from '../../interfaces/ticketDetails.interface';
+import { TicketDetails } from '../../interfaces/ticket-details.interface';
+import { TableActionsService } from '../../services/table-actions.service';
 @Component({
   selector: 'app-custom-table',
   templateUrl: './custom-table.component.html',
@@ -14,30 +15,27 @@ export class CustomTableComponent implements OnChanges {
   @Input() paginationConfig: PaginationConfig = { rowsPerPage: 5, currentPage: 1 };
   @Input() columns: TableColumnDetails[] = [];
   @Input() actionsKey!: string;
-  @Input() rowActionsList!: RowActions[];
-  @Input() headerActionsList!: TableAction[];
-
-  // To handle cases without a specific identifier key
-  generatedIdKey: string = '__generatedId';
+  @Input() actionsList!: TableActionsDetails[];
+  
 
   removedColumns: { column: TableColumnDetails, index: number }[] = [];
-  selectedRowsMap: { [page: number]: any[] } = {};
+  selectedRowsMap: { [page: number]: TicketDetails[] } = {};
   sortColumn: string = '';
   sortDirection: 'asc' | 'desc' = 'asc';
 
   showCommonActionsOnly: boolean = false;
-  paginatedData: any[] = [];
+  paginatedData: TicketDetails[] = [];
   totalPages: number = 0;
   rowsPerPageOptions: number[] = [2, 3, 4, 5];
+  rowActionsMap: { [key: number]: TableActionsDetails[] } = {};
 
-  constructor(private cd: ChangeDetectorRef) { }
+  constructor(private cd: ChangeDetectorRef, private actionService: TableActionsService) { }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['data'] && this.data && this.data.length > 0) {
+    if (changes['data'] && this.data && this.data.length > 0) {      
       this.updatePagination();
       this.cd.markForCheck();
     }
-    this.updateShowCommonActionsOnly();
   }
 
   sortData(column: TableColumnDetails) {
@@ -94,7 +92,7 @@ export class CustomTableComponent implements OnChanges {
   jumpToLastPage() {
     this.onPageChange(this.totalPages);
   }
-  
+
   // single and multi select
   selectAll(event: Event) {
     const checkbox = event.target as HTMLInputElement;
@@ -118,8 +116,8 @@ export class CustomTableComponent implements OnChanges {
     const currentPage = this.paginationConfig.currentPage;
     return this.selectedRowsMap[currentPage]?.some(selected => selected.ticketNo === item.ticketNo) || false;
   }
-  
-  selectItem(event: Event, item: any) {
+
+  selectItem(event: Event, item: TicketDetails) {
     const checkbox = event.target as HTMLInputElement;
     const currentPage = this.paginationConfig.currentPage;
     if (!this.selectedRowsMap[currentPage]) {
@@ -183,7 +181,7 @@ export class CustomTableComponent implements OnChanges {
     this.removedColumns = [];
   }
 
-  getRowValue(row: TicketDetails, columnName: string): any {
+  getRowValue(row: TicketDetails, columnName: string): string | number | Date | null {
     const column = this.columns.find(col => col.name === columnName);
     if (column) {
       return row[column.rowDetail as keyof typeof row];
@@ -191,24 +189,29 @@ export class CustomTableComponent implements OnChanges {
     return null; // Handle the case where the column is not found
   }
 
-  updateShowCommonActionsOnly() {
-    const currentPage = this.paginationConfig.currentPage;
-    const selectedRows = this.selectedRowsMap[currentPage] || [];
-  
-    if (selectedRows.length > 1) {
-      // Check if there are common actions applicable to all selected rows
-      const commonActions = this.getCommonActions();
-      this.showCommonActionsOnly = commonActions.length > 0;
-    } else {
-      this.showCommonActionsOnly = false; // Reset if less than 2 rows are selected
-    }
+  setRowActions(row: TicketDetails, index: number) {
+    const actions = this.getRowActions(row);
+    this.rowActionsMap[index] = actions;
   }
-  performAction(actionId: number, item: any) {
-    const action = this.rowActionsList.find(a => a.id === actionId);
-    if (action && action.actionLogic) {
-      action.actionLogic(item);
+
+  getRowActions(row: TicketDetails): TableActionsDetails[] {
+    let stateId: number | undefined;
+  
+    if ((row as any).hasOwnProperty(this.actionsKey)) {
+      stateId = (row as any)[this.actionsKey] as number;
     } else {
-      console.error(`Action with id ${actionId} not found.`);
+      console.error(`Row does not have property ${this.actionsKey}`);
+      return [];
+    }    
+    return this.actionService.getActionsForState(stateId, this.actionsList);
+  }
+  
+  performAction(actionName: string, row: TicketDetails) {
+    const action = this.actionsList.find(a => a.actionName === actionName);
+    if (action && action.actionLogic) {
+      action.actionLogic(row);
+    } else {
+      console.error(`Action with name ${actionName} not found.`);
     }
   }
 
@@ -218,55 +221,20 @@ export class CustomTableComponent implements OnChanges {
     return selectedRows.length;
   }
   
-  getCommonActions(): { id: number, name: string, count: number }[] {
+  performBulkAction(actionName: string) {
     const currentPage = this.paginationConfig.currentPage;
     const selectedRows = this.selectedRowsMap[currentPage] || [];
-    if (selectedRows.length < 2) return [];
+    const action = this.actionsList.find(a => a.actionName === actionName);
   
-    const actionCounts: { [id: number]: number } = {};
-    selectedRows.forEach((row) => {
-      if (row.allowedActions) {
-        row.allowedActions.forEach((actionId: number) => {
-          if (!actionCounts[actionId]) {
-            actionCounts[actionId] = 0;
-          }
-          actionCounts[actionId]++;
-        });
-      }
-    });
+    if (!action) {
+      console.error(`Action with name ${actionName} not found.`);
+      return;
+    }
   
-    const commonActions: { id: number, name: string, count: number }[] = [];
-    const processedActions: Set<number> = new Set();
-  
-    const allActions = [...this.headerActionsList, ...this.rowActionsList];
-  
-    allActions.forEach(action => {
-      if (actionCounts[action.id] === selectedRows.length && !processedActions.has(action.id)) {
-        commonActions.push({ id: action.id, name: action.actionName || '', count: actionCounts[action.id] || 0 });
-        processedActions.add(action.id);
-      }
-    });
-  
-    return commonActions;
-  }
-  
-
-  performBulkAction(actionId: number) {
-    const currentPage = this.paginationConfig.currentPage;
-    const selectedRows = this.selectedRowsMap[currentPage] || [];
-
-    const action = this.headerActionsList.find(a => a.id === actionId) || this.rowActionsList.find(a => a.id === actionId);
-
-    if (action) {
-      if ('function' in action && typeof action.function === 'function') {
-        action.function(selectedRows);
-      } else if ('actionLogic' in action && typeof action.actionLogic === 'function') {
-        action.actionLogic(selectedRows);
-      } else {
-        console.error(`Action with id ${actionId} has no valid logic.`);
-      }
+    if (action.actionLogic) {
+      action.actionLogic(selectedRows);
     } else {
-      console.error(`Action with id ${actionId} not found.`);
+      console.error(`Action with name ${actionName} has no valid logic.`);
     }
   }
 }

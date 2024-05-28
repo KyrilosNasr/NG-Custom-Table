@@ -11,5 +11,5 @@
     jobNumber: number;
     department: string;
     whom: string;
-    allowedActions?:number[]
+    stateId:number
   }

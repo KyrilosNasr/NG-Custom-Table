@@ -19,7 +19,6 @@ export class HomeComponent {
   }
   actionsList:TableActionsDetails[]  = [
     {
-      id:1,
       actionName:'disable',
       actionType:1,
       actionLogic:(row:any,rowsList?:any) =>{
@@ -27,7 +26,6 @@ export class HomeComponent {
       }
     },
     {
-      id:2,
       actionName:'enable',
       actionType:1,
       actionLogic:(row:any,rowsList?:any) =>{
@@ -35,7 +33,6 @@ export class HomeComponent {
       }
     },
     {
-      id:1,
       actionName:'accept',
       actionType:2,
       actionLogic:(row:any,rowsList?:any) =>{
@@ -43,7 +40,6 @@ export class HomeComponent {
       }
     },
     {
-      id:2,
       actionName:'reject',
       actionType:3,
       actionLogic:(row:any,rowsList?:any) =>{
@@ -51,7 +47,6 @@ export class HomeComponent {
       }
     },
     {
-      id:3,
       actionName:'delete',
       actionLogic:(row:any,rowsList?:any) =>{
         rowsList?.length ? console.log('delete',rowsList): console.log('delete',row);
@@ -59,7 +54,6 @@ export class HomeComponent {
       }
     },
     {
-      id:4,
       actionName:'view',
       actionType:2,
       actionLogic:(row:any,rowsList?:any) =>{
@@ -68,7 +62,6 @@ export class HomeComponent {
       }
     },
     {
-      id:5,
       actionName:'edit',
       actionType:2,
       actionLogic:(row:any,rowsList?:any) =>{

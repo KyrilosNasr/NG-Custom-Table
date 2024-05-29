@@ -7,7 +7,6 @@ export interface TableColumnDetails {
   }
 
   export interface TableActionsDetails {
-  id: number;
   actionType?:number;
   actionName: string;
   actionLogic: (row: TicketDetails | TicketDetails[]) => void;

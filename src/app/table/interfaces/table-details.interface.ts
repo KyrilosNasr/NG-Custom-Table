@@ -1,4 +1,12 @@
-import { TicketDetails } from "./ticket-details.interface";
+export interface TableConfig {
+  data: any[];
+  paginationConfig: PaginationConfig;
+  columns: TableColumnDetails[];
+  actionsKey: string;
+  actionsList: TableActionsDetails[];
+  extraConfig?: { [key: string]: any };
+}
+
 export interface TableColumnDetails {
     name: string;
     rowDetail?:string;
@@ -9,5 +17,11 @@ export interface TableColumnDetails {
   export interface TableActionsDetails {
   actionType?:number;
   actionName: string;
-  actionLogic: (row: TicketDetails | TicketDetails[]) => void;
+  status:string | number | number[] | string[];
+  actionLogic: (row: any | any[]) => void;
+}
+
+export interface PaginationConfig {
+  rowsPerPage: number;
+  currentPage: number;
 }

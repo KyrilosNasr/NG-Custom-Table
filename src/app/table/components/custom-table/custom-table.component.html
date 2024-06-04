@@ -1,150 +1,166 @@
-<div class="d-flex align-items-center justify-content-around my-5">
-  <!-- Drag and drop area -->
-  <div class="drag-drop-area border border-danger p-3 w-50 text-center" (drop)="onDrop($event)"
-    (dragover)="allowDrop($event)">
-    Drag and drop here
-  </div>
+<ng-container *ngIf="tableConfig.data.length > 0">
 
-  <!-- Display removed column names as clickable elements -->
-  <div *ngIf="removedColumns.length"
-    class="removed-column d-flex justify-content-between align-items-center flex-column">
-    <h2> Removed Columns</h2>
-    <div class="d-flex align-items-center gap-3">
-      <!-- Loop through removed columns and display them as clickable elements -->
-      <div *ngFor="let item of removedColumns" class="pointer">
-        <span class="bg-success rounded-pill px-3 d-flex align-items-center text-capitalize py-2 text-white"
-          (click)="restoreColumn(item.column.name)">{{ item.column.name }} <i class="bi bi-x ms-2"></i></span>
+  <div class="d-flex align-items-center justify-content-around my-5">
+    <!-- Drag and drop area -->
+    <div class="drag-drop-area border border-danger p-3 w-50 text-center" (drop)="onDrop($event)"
+      (dragover)="allowDrop($event)">
+      Drag and drop here
+    </div>
+
+    <!-- Display removed column names as clickable elements -->
+    <div *ngIf="removedColumns.length"
+      class="removed-column d-flex justify-content-between align-items-center flex-column">
+      <h2> Removed Columns</h2>
+      <div class="d-flex align-items-center gap-3">
+        <!-- Loop through removed columns and display them as clickable elements -->
+        <div *ngFor="let item of removedColumns" class="pointer">
+          <span class="bg-success rounded-pill px-3 d-flex align-items-center text-capitalize py-2 text-white"
+            (click)="restoreColumn(item.column.name)">{{ item.column.name }} <i class="bi bi-x ms-2"></i></span>
+        </div>
+        <button class="btn btn-primary" (click)="restoreAllColumns()">Restore All <i
+            class="bi bi-arrow-repeat"></i></button>
       </div>
-      <button class="btn btn-primary" (click)="restoreAllColumns()">Restore All <i
-          class="bi bi-arrow-repeat"></i></button>
     </div>
   </div>
-</div>
 
-<table class="table table-hover table-striped">
-  <thead>
-    <tr>
-      <th scope="col">
-        <input class="form-check-input" type="checkbox" id="selectAllCheckbox" (change)="selectAll($event)"
-          [checked]="areAllVisibleSelected()" [indeterminate]="areSomeVisibleSelected()">
-      </th>
-      <th>
-        <!-- Actions Menu in Table Header -->
-        <ng-container *ngIf="selectedRowsMap[paginationConfig.currentPage]">
-          <div *ngIf="actionsList.length && selectedRowsMap[paginationConfig.currentPage].length > 1" class="dropdown">
-            <button class="btn p-0" type="button" id="bulkActionsMenu" data-bs-toggle="dropdown" aria-expanded="false">
+  <table class="table table-hover table-striped">
+    <thead>
+      <tr>
+        <th scope="col">
+          <input class="form-check-input" type="checkbox" id="selectAllCheckbox" (change)="selectAll($event)"
+            [checked]="areAllVisibleSelected()" [indeterminate]="areSomeVisibleSelected()">
+        </th>
+        <th>
+          <!-- Actions Menu in Table Header -->
+          <ng-container *ngIf="selectedRowsMap[tableConfig.paginationConfig.currentPage]">
+            <div
+              *ngIf="tableConfig.actionsList.length && selectedRowsMap[tableConfig.paginationConfig.currentPage].length > 1"
+              class="dropdown">
+              <button class="btn p-0" type="button" id="bulkActionsMenu" data-bs-toggle="dropdown"
+                aria-expanded="false">
+                <i class="bi bi-three-dots-vertical"></i>
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="bulkActionsMenu">
+                <!-- Render header actions -->
+                <!-- needs to be fixed -->
+                <ng-container *ngFor="let action of tableConfig.actionsList">
+                  <ng-container *ngIf="action.actionType === 1 || action.actionType === 3">
+                    <li class="pointer">
+                      <a class="dropdown-item d-flex justify-content-between align-items-center text-capitalize pointer"
+                        (click)="performBulkAction(action.actionName)">
+                        <span>{{ action.actionName }}</span>
+                        <span class="badge bg-primary">{{ getSelectedRowCount() }}</span>
+                      </a>
+                    </li>
+                  </ng-container>
+                </ng-container>
+              </ul>
+            </div>
+          </ng-container>
+        </th>
+        <ng-container *ngFor="let column of tableConfig.columns">
+          <th scope="col" [attr.data-column]="column.name" [class.defualt]="column.sortable && !column.draggable"
+            [class.grap]="column.draggable && !column.sortable" [class.copy]="column.sortable  && column.draggable"
+            [class.not-allowed]="!column.sortable  && !column.draggable" [draggable]="column.draggable"
+            (dragstart)="onDragStart($event, column)">
+            <span class="text-capitalize" (click)="sortData(column)">
+              {{ column.name }}
+              <span *ngIf="sortColumn === column.name">
+                <i *ngIf="sortDirection === 'asc'" class="bi bi-arrow-up"></i>
+                <i *ngIf="sortDirection === 'desc'" class="bi bi-arrow-down"></i>
+              </span>
+            </span>
+          </th>
+        </ng-container>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of paginatedData; index as i ">
+        <td>
+          <input class="form-check-input" type="checkbox" (change)="selectItem($event, row)"
+            [checked]="isSelected(row)">
+        </td>
+        <td>
+          <div class="dropdown">
+            <button class="btn" type="button" id="actionsMenu{{i}}" data-bs-toggle="dropdown" aria-expanded="false"
+              (click)="setRowActions(row, i)">
               <i class="bi bi-three-dots-vertical"></i>
             </button>
-            <ul class="dropdown-menu" aria-labelledby="bulkActionsMenu">
-              <!-- Render header actions -->
-              <ng-container *ngFor="let action of actionsList">
-                <ng-container *ngIf="action.actionType === 1 || action.actionType === 3">
-                  <li class="pointer">
-                    <a class="dropdown-item d-flex justify-content-between align-items-center text-capitalize pointer"
-                       (click)="performBulkAction(action.actionName)">
-                      <span>{{ action.actionName }}</span>
-                      <span class="badge bg-primary">{{ getSelectedRowCount() }}</span>
-                    </a>
-                  </li>
-                </ng-container>
+            <ul class="dropdown-menu" [attr.aria-labelledby]="'actionsMenu' + i">
+              <ng-container *ngFor="let action of rowActionsMap[i] || []">
+                <li class="pointer">
+                  <a class="dropdown-item d-flex align-items-center" (click)="performAction(action.actionName, row)">
+                    <span [ngClass]="{
+                      'text-primary': action.actionName === 'accept',
+                      'text-danger-emphasis': action.actionName === 'reject',
+                      'text-success': action.actionName === 'edit',
+                      'text-danger': action.actionName === 'delete'
+                    }">
+                      {{ action.actionName | titlecase }}
+                    </span>
+                  </a>
+                </li>
               </ng-container>
             </ul>
           </div>
+        </td>
+        <ng-container *ngFor="let column of tableConfig.columns">
+          <td>{{ getRowValue(row, column.name) | smartFormat }}</td>
         </ng-container>
-      </th>
-      <ng-container *ngFor="let column of columns">
-        <th scope="col" [attr.data-column]="column.name" [class.defualt]="column.sortable && !column.draggable"
-          [class.grap]="column.draggable && !column.sortable" [class.copy]="column.sortable  && column.draggable"
-          [class.not-allowed]="!column.sortable  && !column.draggable" [draggable]="column.draggable"
-          (dragstart)="onDragStart($event, column)">
-          <span class="text-capitalize" (click)="sortData(column)">
-            {{ column.name }}
-            <span *ngIf="sortColumn === column.name">
-              <i *ngIf="sortDirection === 'asc'" class="bi bi-arrow-up"></i>
-              <i *ngIf="sortDirection === 'desc'" class="bi bi-arrow-down"></i>
-            </span>
-          </span>
-        </th>
-      </ng-container>
-    </tr>
-  </thead>
-  <tbody>
-    <tr *ngFor="let row of paginatedData; index as i ">
-      <td>
-        <input class="form-check-input" type="checkbox" (change)="selectItem($event, row)" [checked]="isSelected(row)">
-      </td>
-      <td>
-        <div class="dropdown">
-          <button class="btn" type="button" id="actionsMenu{{i}}" data-bs-toggle="dropdown" aria-expanded="false"
-                  (click)="setRowActions(row, i)">
-            <i class="bi bi-three-dots-vertical"></i>
-          </button>
-          <ul class="dropdown-menu" [attr.aria-labelledby]="'actionsMenu' + i">
-            <ng-container *ngFor="let action of rowActionsMap[i] || []">
-              <li class="pointer">
-                <a class="dropdown-item d-flex align-items-center" (click)="performAction(action.actionName, row)">
-                  <span [ngClass]="{
-                    'text-primary': action.actionName === 'accept',
-                    'text-danger-emphasis': action.actionName === 'reject',
-                    'text-success': action.actionName === 'edit',
-                    'text-danger': action.actionName === 'delete'
-                  }">
-                    {{ action.actionName | titlecase }}
-                  </span>
-                </a>
-              </li>
-            </ng-container>
-          </ul>
-        </div>
-      </td>
-      <ng-container *ngFor="let column of columns">
-        <td>{{ getRowValue(row, column.name) | smartFormat}}</td>
-      </ng-container>
-    </tr>
-  </tbody>
-</table>
+      </tr>
+    </tbody>
+  </table>
 
-<div class="d-flex align-items-center justify-content-around flex-row mt-5">
-  <nav *ngIf="data.length > paginationConfig.rowsPerPage">
-    <ul class="pagination justify-content-center">
-      <!-- Jump to First Page Button -->
-      <li class="page-item" [class.disabled]="paginationConfig.currentPage === 1">
-        <a class="page-link" href="#" (click)="jumpToFirstPage()" aria-label="First">
-          <span aria-hidden="true">&laquo;&laquo;</span>
-        </a>
-      </li>
-      <!-- Previous Page Button -->
-      <li class="page-item" [class.disabled]="paginationConfig.currentPage === 1">
-        <a class="page-link" href="#" (click)="onPageChange(paginationConfig.currentPage - 1)" aria-label="Previous">
-          <span aria-hidden="true">&laquo;</span>
-        </a>
-      </li>
-      <!-- Page Numbers -->
-      <li class="page-item" *ngFor="let page of pages" [class.active]="paginationConfig.currentPage === page">
-        <a class="page-link" href="#" (click)="onPageChange(page)">{{ page }}</a>
-      </li>
-      <!-- Next Page Button -->
-      <li class="page-item" [class.disabled]="paginationConfig.currentPage === totalPages">
-        <a class="page-link" href="#" (click)="onPageChange(paginationConfig.currentPage + 1)" aria-label="Next">
-          <span aria-hidden="true">&raquo;</span>
-        </a>
-      </li>
-      <!-- Jump to Last Page Button -->
-      <li class="page-item" [class.disabled]="paginationConfig.currentPage === totalPages">
-        <a class="page-link" href="#" (click)="jumpToLastPage()" aria-label="Last">
-          <span aria-hidden="true">&raquo;&raquo;</span>
-        </a>
-      </li>
-    </ul>
-  </nav>
+  <div class="d-flex align-items-center justify-content-around flex-row mt-5">
+    <nav *ngIf="tableConfig.data.length > tableConfig.paginationConfig.rowsPerPage">
+      <ul class="pagination justify-content-center">
+        <!-- Jump to First Page Button -->
+        <li class="page-item" [class.disabled]="tableConfig.paginationConfig.currentPage === 1">
+          <a class="page-link" href="#" (click)="jumpToFirstPage()" aria-label="First">
+            <span aria-hidden="true">&laquo;&laquo;</span>
+          </a>
+        </li>
+        <!-- Previous Page Button -->
+        <li class="page-item" [class.disabled]="tableConfig.paginationConfig.currentPage === 1">
+          <a class="page-link" href="#" (click)="onPageChange(tableConfig.paginationConfig.currentPage - 1)"
+            aria-label="Previous">
+            <span aria-hidden="true">&laquo;</span>
+          </a>
+        </li>
+        <!-- Page Numbers -->
+        <li class="page-item" *ngFor="let page of pages"
+          [class.active]="tableConfig.paginationConfig.currentPage === page">
+          <a class="page-link" href="#" (click)="onPageChange(page)">{{ page }}</a>
+        </li>
+        <!-- Next Page Button -->
+        <li class="page-item" [class.disabled]="tableConfig.paginationConfig.currentPage === totalPages">
+          <a class="page-link" href="#" (click)="onPageChange(tableConfig.paginationConfig.currentPage + 1)"
+            aria-label="Next">
+            <span aria-hidden="true">&raquo;</span>
+          </a>
+        </li>
+        <!-- Jump to Last Page Button -->
+        <li class="page-item" [class.disabled]="tableConfig.paginationConfig.currentPage === totalPages">
+          <a class="page-link" href="#" (click)="jumpToLastPage()" aria-label="Last">
+            <span aria-hidden="true">&raquo;&raquo;</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
 
-  <div class="row w-25">
-    <div class="col-md-6 d-flex flex-row gap-3 justify-content-around align-items-center w-100">
-      <label for="rowsPerPage">Rows Per Page:</label>
-      <select class="form-select w-50" id="rowsPerPage" [(ngModel)]="paginationConfig.rowsPerPage"
-        (change)="onRowsPerPageChange()">
-        <option *ngFor="let option of rowsPerPageOptions" [value]="option">{{ option }}</option>
-      </select>
+    <div class="row w-25">
+      <div class="col-md-6 d-flex flex-row gap-3 justify-content-around align-items-center w-100">
+        <label for="rowsPerPage">Rows Per Page:</label>
+        <select class="form-select w-50" id="rowsPerPage" [(ngModel)]="tableConfig.paginationConfig.rowsPerPage"
+          (change)="onRowsPerPageChange()">
+          <option *ngFor="let option of rowsPerPageOptions" [value]="option">{{ option }}</option>
+        </select>
+      </div>
     </div>
   </div>
-</div>
+</ng-container>
+
+<ng-container
+ *ngIf="tableConfig.data.length <= 0">
+ 
+</ng-container>

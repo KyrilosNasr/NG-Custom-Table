@@ -7,7 +7,7 @@ export let ticketsList: TicketDetails[] = [
     title: 'منتم',
     category: 'Air',
     priority: 'Normal',
-    status: 'In Progress',
+    status: 'pending',
     date: new Date('2023-12-17'),
     updated: new Date('2024-04-30'),
     deliveryTime: new Date('1970-01-01T00:05:00'),

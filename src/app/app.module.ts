@@ -5,22 +5,28 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { TableModule } from './table/table.module';
 import { HomeComponent } from './home/home.component';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
+import { UserFromComponent } from './user-from/user-from.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { DateFormatDirective } from './user-from/directives/date-format.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
-    HomeComponent
+    HomeComponent,
+    UserFromComponent,
+    DateFormatDirective
   ],
   imports: [
     BrowserModule,
     CommonModule,
     AppRoutingModule,
+    ReactiveFormsModule,
     HttpClientModule,
     TableModule
   ],
-  providers: [],
+  providers: [DatePipe],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

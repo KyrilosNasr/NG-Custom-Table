@@ -13,18 +13,19 @@ export class DateFormatDirective implements OnInit, OnDestroy {
   constructor(private el: ElementRef, private control: NgControl, private renderer: Renderer2) { }
 
   ngOnInit() {
-    if (this.control.control) {
-      this.control.control.valueChanges
+    if (this.control && this.control.valueChanges) {
+      this.control.valueChanges
         .pipe(
           distinctUntilChanged(),
           takeUntil(this.destroy$)
         )
         .subscribe(value => {
           if (value) {
-
-            // const formattedDate = this.datePipe.transform(new Date(value), 'dd MMMM yyyy');
-            const formattedDate = formatDate(value,'d MMM yyyy','en')
+            const dateObject = new Date(value.year, value.month - 1, value.day); // Month -1 because is zero-based
+            const formattedDate = formatDate(dateObject, 'dd MMMM yyyy', 'en');
             if (formattedDate) {
+              console.log(formattedDate);
+              
               this.renderer.setProperty(this.el.nativeElement, 'value', formattedDate);
             }
           }

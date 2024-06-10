@@ -8,8 +8,9 @@ import { HomeComponent } from './home/home.component';
 import { CommonModule, DatePipe } from '@angular/common';
 import { HttpClientModule } from '@angular/common/http';
 import { UserFromComponent } from './user-from/user-from.component';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DateFormatDirective } from './user-from/directives/date-format.directive';
+import { NgbDatepickerModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,10 @@ import { DateFormatDirective } from './user-from/directives/date-format.directiv
     AppRoutingModule,
     ReactiveFormsModule,
     HttpClientModule,
-    TableModule
+    TableModule,
+    NgbModule,
+    NgbDatepickerModule,
+    FormsModule
   ],
   providers: [DatePipe],
   bootstrap: [AppComponent]

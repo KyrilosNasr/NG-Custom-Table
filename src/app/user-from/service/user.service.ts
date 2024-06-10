@@ -1,29 +1,33 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, Observable, map } from 'rxjs';
+import { User } from '../interfaces/user.interface';
+import { ValidationErrors } from '@angular/forms';
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-  private usersSubject = new BehaviorSubject<any[]>([]);
-  users$: Observable<any[]> = this.usersSubject.asObservable();
+  private usersSubject = new BehaviorSubject<User[]>([]);
+  users$: Observable<User[]> = this.usersSubject.asObservable();
 
-  private users: any[] = [];
+  private users: User[] = [];
 
-  addUser(user: any) {
+  addUser(user: User) {
+    const users = this.usersSubject.getValue(); // Get current users array
     this.users.push(user);
-    this.usersSubject.next(this.users);
+    const currentUsers = this.usersSubject.getValue();
+    const updatedUsers = [...currentUsers, user];
+    this.usersSubject.next(updatedUsers);
   }
 
-  isEmailUnique(email: string): boolean {
-    return !this.users.some(user => user.email === email);
+  isEmailUnique(email: string):{emailNotUnique: boolean;} | null {
+    return this.users.some(user => user.email === email) ? {'emailNotUnique':true} : null;
   }
-
-  isPhoneNumberUnique(phoneNumber: string): boolean {
-    return !this.users.some(user => user.phoneNumber === phoneNumber);
+  
+  isPhoneNumberUnique(phoneNumber: number): ValidationErrors | null {
+    return this.users.some(user => user.phoneNumber === phoneNumber) ? {'phoneNotUnique':true} : null;
   }
-
-  isNationalIdUnique(nationalId: string): boolean {
-    return !this.users.some(user => user.nationalId === nationalId);
+  isNationalIdUnique(nationalId: number): ValidationErrors | null {
+    return this.users.some(user => user.nationalId === nationalId) ? {'nationalIdNotUnique':true} : null;
   }
 }

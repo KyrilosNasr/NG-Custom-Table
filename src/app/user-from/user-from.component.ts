@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { UserService } from './service/user.service';
-import { DatePipe, formatDate } from '@angular/common';
-import { distinctUntilChanged } from 'rxjs';
+import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'app-user-from',
@@ -15,9 +15,32 @@ export class UserFromComponent implements OnInit {
   genders = ['Male', 'Female'];
   countryCodes = [{ code: '+20', country: 'EG' }, { code: '+966', country: 'SA' }];
   dob!: string | null;
-  submited = false;
-  constructor(private fb: FormBuilder, private userService: UserService, private datePipe: DatePipe) {
+  model!: NgbDateStruct;
+  date!: { year: number; month: number };
 
+  constructor(private fb: FormBuilder, private userService: UserService, private datePipe: DatePipe) {}
+
+  public validateField(field: string) {
+    const control = this.userForm.get(field);
+    if (control) {
+      console.log(control.value);
+      
+      control.markAsTouched();
+    }
+  }
+
+  public resetForm() {
+    this.userForm.reset();
+  }
+
+  public onSubmit() {
+    if (this.userForm.valid) {
+      this.userService.addUser(this.userForm.value);
+      
+      this.resetForm();
+      }
+    this.convertDateToString('dateOfBirth'); // Convert the date before submitting the form
+    console.log(this.userForm.value);
   }
 
   ngOnInit(): void {
@@ -38,53 +61,55 @@ export class UserFromComponent implements OnInit {
       ]],
       countryCode: ['', Validators.required],
       phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]*$'), this.phoneNumberUniqueValidator.bind(this)]],
-      dob: ['', Validators.required],
+      dateOfBirth: ['', Validators.required],
       nationalId: ['', [Validators.required, Validators.pattern('^[0-9]*$'), this.nationalIdUniqueValidator.bind(this)]],
       maritalStatus: ['', Validators.required],
       gender: ['', Validators.required],
       addressEn: ['', Validators.required],
       addressAr: ['', Validators.required]
     });
-
-    if (this.userForm.get('dob')?.value) {  // Check if dob has a value
-      this.dob = this.datePipe.transform(this.userForm.get('dob')?.value, 'D, MMMM, YYYY');
-    }
   }
 
-  validateField(field: string) {
-    const control = this.userForm.get(field);
+  private emailUniqueValidator(control: FormControl) {
+    return this.userService.isEmailUnique(control.value)
+  }
+
+  private phoneNumberUniqueValidator(control: FormControl) {
+    return this.userService.isPhoneNumberUnique(control.value)
+  }
+
+  private nationalIdUniqueValidator(control: FormControl) {
+    return this.userService.isNationalIdUnique(control.value)
+  }
+
+  private convertDateToString(controlName: string) {
+    const control = this.userForm.get(controlName);
     if (control) {
-      control.markAsTouched();
+      const dateValue: NgbDateStruct = control.value;
+      if (this.isValidNgbDateStruct(dateValue)) {
+        const jsDate = new Date(dateValue.year, dateValue.month - 1, dateValue.day); // Create a JavaScript Date object
+  
+        if (!isNaN(jsDate.getTime())) { // Check if the date is valid
+          const formattedDate = this.formatDate(jsDate);
+          // control.setValue(formattedDate);
+        } else {
+          console.error('Invalid date format');
+        }
+      } else {
+        console.error('Invalid NgbDateStruct format');
+      }
     }
   }
-  emailUniqueValidator(control: AbstractControl): { [key: string]: boolean } | null {
-    if (this.userService.isEmailUnique(control.value)) {
-      return null;
-    }
-    return { 'emailNotUnique': true };
+  
+  private isValidNgbDateStruct(date: any): date is NgbDateStruct {
+    return date && typeof date.year === 'number' && typeof date.month === 'number' && typeof date.day === 'number';
   }
-
-  phoneNumberUniqueValidator(control: AbstractControl): { [key: string]: boolean } | null {
-    if (this.userService.isPhoneNumberUnique(control.value)) {
-      return null;
-    }
-    return { 'phoneNumberNotUnique': true };
+  
+  private formatDate(date: Date): string {
+    const day = date.getDate().toString().padStart(  2, '0');
+    const month = date.toLocaleString('default', { month: 'long' });
+    const year = date.getFullYear();
+    return `${day} ${month} ${year}`;
   }
-
-  nationalIdUniqueValidator(control: AbstractControl): { [key: string]: boolean } | null {
-    if (this.userService.isNationalIdUnique(control.value)) {
-      return null;
-    }
-    return { 'nationalIdNotUnique': true };
-  }
-
-  onSubmit() {
-    this.submited = true
-    console.log('Form Submitted!', this.userForm.value);
-    if (this.userForm.valid) {
-      this.userService.addUser(this.userForm.value);
-      console.log('Form Submitted!', this.userForm.value);
-      this.userForm.reset();
-    }
-  }
+  
 }

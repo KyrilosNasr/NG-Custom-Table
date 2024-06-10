@@ -1,20 +1,24 @@
-import { Component } from '@angular/core';
-import { columns, ticketsList } from 'src/assets/data/dumy-data';
+import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
+import { columns, ticketsList, userCols, users } from 'src/assets/data/dumy-data';
 import { TicketDetails } from '../table/interfaces/ticket-details.interface';
 import { PaginationConfig, TableConfig } from '../table/interfaces/table-details.interface';
 import { TableActionsDetails, TableColumnDetails } from '../table/interfaces/table-details.interface';
+import { UserService } from '../user-from/service/user.service';
+import { User } from '../user-from/interfaces/user.interface';
 
 @Component({
   selector: 'app-home',
   templateUrl: './home.component.html',
-  styleUrls: ['./home.component.scss']
+  styleUrls: ['./home.component.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HomeComponent {
- 
+export class HomeComponent implements OnInit {
+  
+  dataList:any[] = [];
   tableConfigDetails:TableConfig ={
-    data:ticketsList,
+    data:users,
     paginationConfig:{rowsPerPage:3,currentPage:1},
-    actionsKey:'stateId',
+    actionsKey:'maritalStatus',
     actionsList:[
       {
         actionName: 'disable',
@@ -76,7 +80,17 @@ export class HomeComponent {
         }
       }
     ],
-    columns:columns
+    columns:userCols
   };
+    constructor(private us:UserService){
 
+    }
+
+    ngOnInit(): void {
+      this.us.users$.subscribe((data:User[])=>{
+        this.dataList =data
+        console.log(this.dataList);
+        
+      })
+    }
 }

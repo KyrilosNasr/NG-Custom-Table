@@ -1,5 +1,6 @@
 import { TableColumnDetails } from "src/app/table/interfaces/table-details.interface";
 import { TicketDetails } from "src/app/table/interfaces/ticket-details.interface";
+import { User } from "src/app/user-from/interfaces/user.interface";
 
 export let ticketsList: TicketDetails[] = [
   {
@@ -79,6 +80,31 @@ export let ticketsList: TicketDetails[] = [
   }
 ];
 
+export const users:User[] = [
+  {
+    "firstNameEn": "as",
+    "secondNameEn": "as",
+    "thirdNameEn": "as",
+    "lastNameEn": "as",
+    "firstNameAr": "da",
+    "secondNameAr": "da",
+    "thirdNameAr": "da",
+    "lastNameAr": "da",
+    "email": "a@a.co",
+    "countryCode": "+20",
+    "phoneNumber": 12323123,
+    "dateOfBirth": {
+        "year": 2024,
+        "month": 6,
+        "day": 2
+    },
+    "nationalId": 1234567,
+    "maritalStatus": "Single",
+    "gender": "Male",
+    "addressEn": "asd",
+    "addressAr": "asd"
+}
+]
 export const columns: TableColumnDetails[] =[
   { name: 'Number', rowDetail:'ticketNo', sortable: false, draggable: true },
   { name: 'title',  rowDetail:'title',sortable: true, draggable: true },
@@ -92,4 +118,23 @@ export const columns: TableColumnDetails[] =[
   { name: 'jobNumber',  rowDetail:'jobNumber',sortable: true, draggable: true },
   { name: 'department',  rowDetail:'department',sortable: true, draggable: true },
   { name: 'whom',  rowDetail:'whom',sortable: true, draggable: true },
+];
+export const userCols: TableColumnDetails[] =[
+  { name: 'First Name (English)', rowDetail:'firstNameEn', sortable: false, draggable: true },
+  { name: 'Second Name (English)',  rowDetail:'secondNameEn',sortable: true, draggable: true },
+  { name: 'Third Name (English)',  rowDetail:'thirdNameEn',sortable: true, draggable: false },
+  { name: 'Last Name (English)',  rowDetail:'lastNameEn',sortable: true, draggable: true },
+  { name: 'First Name (Arabic)',  rowDetail:'firstNameAr',sortable: true, draggable: true },
+  { name: 'Second Name (Arabic)', rowDetail:'secondNameAr', sortable: false, draggable: true },
+  { name: 'Third Name (Arabic)', rowDetail:'thirdNameAr', sortable: false, draggable: false },
+  { name: 'Last Name (Arabic)',  rowDetail:'lastNameAr', sortable: false, draggable: false },
+  { name: 'Email',  rowDetail:'email',sortable: false, draggable: false },
+  { name: 'Country Code',  rowDetail:'countryCode',sortable: true, draggable: true },
+  { name: 'Phone Number',  rowDetail:'phoneNumber',sortable: true, draggable: true },
+  { name: 'Date of Birth',  rowDetail:'dateOfBirth',sortable: true, draggable: true },
+  { name: 'National ID',  rowDetail:'nationalId',sortable: true, draggable: true },
+  { name: 'Marital Status',  rowDetail:'maritalStatus',sortable: true, draggable: true },
+  { name: 'Gender',  rowDetail:'gender',sortable: true, draggable: true },
+  { name: 'Address (English)',  rowDetail:'addressEn',sortable: true, draggable: true },
+  { name: 'Address (Arabic)',  rowDetail:'addressAr',sortable: true, draggable: true },
 ];

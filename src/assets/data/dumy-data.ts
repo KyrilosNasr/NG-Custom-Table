@@ -93,11 +93,7 @@ export const users:User[] = [
     "email": "a@a.co",
     "countryCode": "+20",
     "phoneNumber": 12323123,
-    "dateOfBirth": {
-        "year": 2024,
-        "month": 6,
-        "day": 2
-    },
+    "dateOfBirth": '2 june 2024',
     "nationalId": 1234567,
     "maritalStatus": "Single",
     "gender": "Male",

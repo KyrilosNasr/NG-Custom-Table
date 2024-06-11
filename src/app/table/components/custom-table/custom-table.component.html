@@ -81,7 +81,7 @@
             [checked]="isSelected(row)">
         </td>
         <td>
-          <div class="dropdown">
+          <div class="dropdown" *ngIf="tableConfig.actionsKey && tableConfig.actionsList">
             <button class="btn" type="button" id="actionsMenu{{i}}" data-bs-toggle="dropdown" aria-expanded="false"
               (click)="setRowActions(row, i)">
               <i class="bi bi-three-dots-vertical"></i>

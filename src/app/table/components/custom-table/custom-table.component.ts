@@ -194,7 +194,7 @@ export class CustomTableComponent implements OnChanges {
   getRowActions(row: any): TableActionsDetails[] {
     let stateId: number | string;
   
-    if ((row as any).hasOwnProperty(this.tableConfig.actionsKey)) {
+    if ((row as any).hasOwnProperty(this.tableConfig.actionsKey) && this.tableConfig.actionsKey) {
       stateId = (row as any)[this.tableConfig.actionsKey] as number;
     } else {
       console.error(`Row does not have property ${this.tableConfig.actionsKey}`);

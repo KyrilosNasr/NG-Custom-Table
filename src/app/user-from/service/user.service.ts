@@ -12,8 +12,7 @@ export class UserService {
 
   private users: User[] = [];
 
-  addUser(user: User) {
-    const users = this.usersSubject.getValue(); // Get current users array
+  addUser(user: User) {    
     this.users.push(user);
     const currentUsers = this.usersSubject.getValue();
     const updatedUsers = [...currentUsers, user];

@@ -2,7 +2,7 @@ export interface TableConfig {
   data: any[];
   paginationConfig: PaginationConfig;
   columns: TableColumnDetails[];
-  actionsKey: string;
+  actionsKey?: string;
   actionsList: TableActionsDetails[];
   extraConfig?: { [key: string]: any };
 }

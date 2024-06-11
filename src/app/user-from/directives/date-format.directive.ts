@@ -24,8 +24,6 @@ export class DateFormatDirective implements OnInit, OnDestroy {
             const dateObject = new Date(value.year, value.month - 1, value.day); // Month -1 because is zero-based
             const formattedDate = formatDate(dateObject, 'dd MMMM yyyy', 'en');
             if (formattedDate) {
-              console.log(formattedDate);
-              
               this.renderer.setProperty(this.el.nativeElement, 'value', formattedDate);
             }
           }

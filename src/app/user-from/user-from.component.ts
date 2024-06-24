@@ -20,12 +20,6 @@ export class UserFromComponent implements OnInit {
 
   constructor(private fb: FormBuilder, private userService: UserService, private datePipe: DatePipe) { }
 
-  public validateField(field: string) {
-    const control = this.userForm.get(field);
-    if (control) {
-      control.markAsTouched();
-    }
-  }
 
   public resetForm() {
     this.userForm.reset();
@@ -40,8 +34,8 @@ export class UserFromComponent implements OnInit {
       }
       this.userService.addUser(formValue);
       // Reset the form
-    this.resetForm();
-      }
+      this.resetForm();
+    }
   }
 
   ngOnInit(): void {
@@ -50,10 +44,10 @@ export class UserFromComponent implements OnInit {
       secondNameEn: ['', Validators.required],
       thirdNameEn: ['', Validators.required],
       lastNameEn: ['', Validators.required],
-      firstNameAr: ['', Validators.required],
-      secondNameAr: ['', Validators.required],
-      thirdNameAr: ['', Validators.required],
-      lastNameAr: ['', Validators.required],
+      firstNameAr: ['', [Validators.required , this.CheckArLletters.bind(this)]],
+      secondNameAr: ['', [Validators.required , this.CheckArLletters.bind(this)]],
+      thirdNameAr: ['', [Validators.required , this.CheckArLletters.bind(this)]],
+      lastNameAr: ['', [Validators.required , this.CheckArLletters.bind(this)]],
       email: ['', [
         Validators.required,
         Validators.email,
@@ -61,7 +55,7 @@ export class UserFromComponent implements OnInit {
         this.emailUniqueValidator.bind(this)
       ]],
       countryCode: ['', Validators.required],
-      phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]*$'), this.phoneNumberUniqueValidator.bind(this)]],
+      phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]*$'), this.phoneNumberUniqueValidator.bind(this),Validators.maxLength(11),Validators.minLength(10)]],
       dateOfBirth: ['', Validators.required],
       nationalId: ['', [Validators.required, Validators.pattern('^[0-9]*$'), this.nationalIdUniqueValidator.bind(this)]],
       maritalStatus: ['', Validators.required],
@@ -70,7 +64,9 @@ export class UserFromComponent implements OnInit {
       addressAr: ['', Validators.required]
     });
   }
-
+  private CheckArLletters(control:FormControl){
+    return this.userService.arabicValidator(control.value)
+  }
   private emailUniqueValidator(control: FormControl) {
     return this.userService.isEmailUnique(control.value)
   }
@@ -82,7 +78,7 @@ export class UserFromComponent implements OnInit {
   private nationalIdUniqueValidator(control: FormControl) {
     return this.userService.isNationalIdUnique(control.value)
   }
-  private formatDateObject(dateObj: { year: number, month: number, day: number }): string {    
+  private formatDateObject(dateObj: { year: number, month: number, day: number }): string {
     const date = new Date(dateObj.year, dateObj.month - 1, dateObj.day); // -1 -> bcs months is 0 based indexs
     return formatDate(date, 'dd MMMM yyyy', 'en-US');
   }

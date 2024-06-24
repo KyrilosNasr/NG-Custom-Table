@@ -19,6 +19,14 @@ export class UserService {
     this.usersSubject.next(updatedUsers);
   }
 
+  arabicValidator(value: string): ValidationErrors | null {
+    const arabicPattern = /^[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]+$/;
+    if (value && !arabicPattern.test(value)) {
+      return { 'arabicOnly': true };
+    }
+    return null;
+  }
+
   isEmailUnique(email: string):{emailNotUnique: boolean;} | null {
     return this.users.some(user => user.email === email) ? {'emailNotUnique':true} : null;
   }

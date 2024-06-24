@@ -11,13 +11,15 @@ import { UserFromComponent } from './user-from/user-from.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DateFormatDirective } from './user-from/directives/date-format.directive';
 import { NgbDatepickerModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
+import { ArabicOnlyDirective } from './user-from/directives/arabic-only.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     UserFromComponent,
-    DateFormatDirective
+    DateFormatDirective,
+    ArabicOnlyDirective
   ],
   imports: [
     BrowserModule,

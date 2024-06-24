@@ -15,8 +15,7 @@
           <div class="d-flex flex-wrap mb-3">
             <div class="flex-fill me-2">
               <label for="firstNameEn" class="form-label">First Name (English)</label>
-              <input type="text" id="firstNameEn" class="form-control" formControlName="firstNameEn"
-                (blur)="validateField('firstNameEn')">
+              <input type="text" id="firstNameEn" class="form-control" formControlName="firstNameEn">
               <div *ngIf="userForm.get('firstNameEn')?.invalid && userForm.get('firstNameEn')?.touched"
                 class="text-danger">
                 First Name (English) is required
@@ -24,8 +23,7 @@
             </div>
             <div class="flex-fill me-2">
               <label for="secondNameEn" class="form-label">Second Name (English)</label>
-              <input type="text" id="secondNameEn" class="form-control" formControlName="secondNameEn"
-                (blur)="validateField('secondNameEn')">
+              <input type="text" id="secondNameEn" class="form-control" formControlName="secondNameEn">
               <div *ngIf="userForm.get('secondNameEn')?.invalid && userForm.get('secondNameEn')?.touched"
                 class="text-danger">
                 Second Name (English) is required
@@ -33,8 +31,7 @@
             </div>
             <div class="flex-fill me-2">
               <label for="thirdNameEn" class="form-label">Third Name (English)</label>
-              <input type="text" id="thirdNameEn" class="form-control" formControlName="thirdNameEn"
-                (blur)="validateField('thirdNameEn')">
+              <input type="text" id="thirdNameEn" class="form-control" formControlName="thirdNameEn">
               <div *ngIf="userForm.get('thirdNameEn')?.invalid && userForm.get('thirdNameEn')?.touched"
                 class="text-danger">
                 Third Name (English) is required
@@ -42,8 +39,7 @@
             </div>
             <div class="flex-fill">
               <label for="lastNameEn" class="form-label">Last Name (English)</label>
-              <input type="text" id="lastNameEn" class="form-control" formControlName="lastNameEn"
-                (blur)="validateField('lastNameEn')">
+              <input type="text" id="lastNameEn" class="form-control" formControlName="lastNameEn">
               <div *ngIf="userForm.get('lastNameEn')?.invalid && userForm.get('lastNameEn')?.touched"
                 class="text-danger">
                 Last Name (English) is required
@@ -55,8 +51,7 @@
           <div class="d-flex flex-wrap mb-3">
             <div class="flex-fill me-2">
               <label for="firstNameAr" class="form-label">First Name (Arabic)</label>
-              <input type="text" id="firstNameAr" class="form-control" formControlName="firstNameAr"
-                (blur)="validateField('firstNameAr')">
+              <input type="text" id="firstNameAr" placeholder="accepts only AR letters" appArabicOnly class="form-control" formControlName="firstNameAr">
               <div *ngIf="userForm.get('firstNameAr')?.invalid && userForm.get('firstNameAr')?.touched"
                 class="text-danger">
                 First Name (Arabic) is required
@@ -64,8 +59,7 @@
             </div>
             <div class="flex-fill me-2">
               <label for="secondNameAr" class="form-label">Second Name (Arabic)</label>
-              <input type="text" id="secondNameAr" class="form-control" formControlName="secondNameAr"
-                (blur)="validateField('secondNameAr')">
+              <input type="text" id="secondNameAr" appArabicOnly class="form-control" placeholder="accepts only AR letters" formControlName="secondNameAr">
               <div *ngIf="userForm.get('secondNameAr')?.invalid && userForm.get('secondNameAr')?.touched"
                 class="text-danger">
                 Second Name (Arabic) is required
@@ -73,8 +67,7 @@
             </div>
             <div class="flex-fill me-2">
               <label for="thirdNameAr" class="form-label">Third Name (Arabic)</label>
-              <input type="text" id="thirdNameAr" class="form-control" formControlName="thirdNameAr"
-                (blur)="validateField('thirdNameAr')">
+              <input type="text" id="thirdNameAr" appArabicOnly class="form-control" formControlName="thirdNameAr" placeholder="accepts only AR letters">
               <div *ngIf="userForm.get('thirdNameAr')?.invalid && userForm.get('thirdNameAr')?.touched"
                 class="text-danger">
                 Third Name (Arabic) is required
@@ -82,8 +75,7 @@
             </div>
             <div class="flex-fill">
               <label for="lastNameAr" class="form-label">Last Name (Arabic)</label>
-              <input type="text" id="lastNameAr" class="form-control" formControlName="lastNameAr"
-                (blur)="validateField('lastNameAr')">
+              <input type="text" id="lastNameAr" appArabicOnly class="form-control" placeholder="accepts only AR letters" formControlName="lastNameAr">
               <div *ngIf="userForm.get('lastNameAr')?.invalid && userForm.get('lastNameAr')?.touched"
                 class="text-danger">
                 Last Name (Arabic) is required
@@ -94,7 +86,7 @@
           <!-- Email -->
           <div class="mb-3">
             <label for="email" class="form-label">Email</label>
-            <input type="email" id="email" class="form-control" formControlName="email" (blur)="validateField('email')">
+            <input type="email" id="email" class="form-control" formControlName="email">
             <div *ngIf="userForm.get('email')?.invalid && userForm.get('email')?.touched" class="text-danger">
               <div *ngIf="userForm.get('email')?.errors?.['required']">Email is required</div>
               <div *ngIf="userForm.get('email')?.errors?.['pattern']">Invalid email format</div>
@@ -107,8 +99,7 @@
           <div class="d-flex mb-3">
             <div class="me-2">
               <label for="countryCode" class="form-label">Country Code</label>
-              <select id="countryCode" class="form-select" formControlName="countryCode"
-                (blur)="validateField('countryCode')">
+              <select id="countryCode" class="form-select" formControlName="countryCode">
                 <option *ngFor="let code of countryCodes" [value]="code.code">{{ code.country }} ({{ code.code }})
                 </option>
               </select>
@@ -120,12 +111,15 @@
 
             <div class="flex-fill">
               <label for="phoneNumber" class="form-label">Phone Number</label>
-              <input type="number" id="phoneNumber" class="form-control" formControlName="phoneNumber"
-                (blur)="validateField('phoneNumber')">
+              <input type="tel" id="phoneNumber" class="form-control" formControlName="phoneNumber" placeholder="only numberss allowed">
               <div *ngIf="userForm.get('phoneNumber')?.invalid && userForm.get('phoneNumber')?.touched"
                 class="text-danger">
                 <div *ngIf="userForm.get('phoneNumber')?.errors?.['required']">Phone Number is required</div>
                 <div *ngIf="userForm.get('phoneNumber')?.errors?.['pattern']">Phone Number must contain only numbers
+                </div>
+                <div *ngIf="userForm.get('phoneNumber')?.errors?.['maxlength']">Phone Number must be 11 number length as max
+                </div>
+                <div *ngIf="userForm.get('phoneNumber')?.errors?.['minlength']">Phone Number must be 10 number length as minimum
                 </div>
                 <div *ngIf="userForm.get('phoneNumber')?.errors?.['phoneNotUnique']">Phone Number is already taken
                 </div>
@@ -139,7 +133,7 @@
             <div class="input-group">
               <input class="form-control" placeholder="dd Mmmm yyyy" formControlName="dateOfBirth" appDateFormat ngbDatepicker
                 #d="ngbDatepicker"/>
-              <button class="btn btn-outline-secondary bi bi-calendar3" (click)="d.toggle()"(blur)="validateField('dateOfBirth')" type="button"></button>
+              <button class="btn btn-outline-secondary bi bi-calendar3" (click)="d.toggle()" type="button"></button>
             </div>
             <div *ngIf="userForm.get('dateOfBirth')?.invalid && userForm.get('dateOfBirth')?.touched" class="text-danger">
               Date of Birth is required
@@ -149,8 +143,7 @@
           <!-- National ID -->
           <div class="mb-3">
             <label for="nationalId" class="form-label">National ID</label>
-            <input type="number" id="nationalId" class="form-control" formControlName="nationalId"
-              (blur)="validateField('nationalId')">
+            <input type="number" id="nationalId" class="form-control" formControlName="nationalId">
             <div *ngIf="userForm.get('nationalId')?.invalid && userForm.get('nationalId')?.touched" class="text-danger">
               <div *ngIf="userForm.get('nationalId')?.errors?.['required']">National ID is required</div>
               <div *ngIf="userForm.get('nationalId')?.errors?.['pattern']">National ID must contain only numbers</div>
@@ -162,8 +155,7 @@
           <!-- Marital Status -->
           <div class="mb-3">
             <label for="maritalStatus" class="form-label">Marital Status</label>
-            <select id="maritalStatus" class="form-select" formControlName="maritalStatus"
-              (blur)="validateField('maritalStatus')">
+            <select id="maritalStatus" class="form-select" formControlName="maritalStatus">
               <option *ngFor="let status of maritalStatuses" [value]="status">{{ status }}</option>
             </select>
             <div *ngIf="userForm.get('maritalStatus')?.invalid && userForm.get('maritalStatus')?.touched"
@@ -175,7 +167,7 @@
           <!-- Gender -->
           <div class="mb-3">
             <label for="gender" class="form-label">Gender</label>
-            <select id="gender" class="form-select" formControlName="gender" (blur)="validateField('gender')">
+            <select id="gender" class="form-select" formControlName="gender">
               <option *ngFor="let gender of genders" [value]="gender">{{ gender }}</option>
             </select>
             <div *ngIf="userForm.get('gender')?.invalid && userForm.get('gender')?.touched" class="text-danger">
@@ -186,16 +178,14 @@
           <!-- Address Fields -->
           <div class="mb-3">
             <label for="addressEn" class="form-label">Address (English)</label>
-            <input type="text" id="addressEn" class="form-control" formControlName="addressEn"
-              (blur)="validateField('addressEn')">
+            <input type="text" id="addressEn" class="form-control" formControlName="addressEn">
             <div *ngIf="userForm.get('addressEn')?.invalid && userForm.get('addressEn')?.touched" class="text-danger">
               Address (English) is required
             </div>
           </div>
           <div class="mb-3">
             <label for="addressAr" class="form-label">Address (Arabic)</label>
-            <input type="text" id="addressAr" class="form-control" formControlName="addressAr"
-              (blur)="validateField('addressAr')">
+            <input type="text" id="addressAr" class="form-control" formControlName="addressAr">
             <div *ngIf="userForm.get('addressAr')?.invalid && userForm.get('addressAr')?.touched" class="text-danger">
               Address (Arabic) is required
             </div>

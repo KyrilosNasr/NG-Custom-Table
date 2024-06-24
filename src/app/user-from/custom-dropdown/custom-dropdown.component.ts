@@ -106,6 +106,8 @@ export class CustomDropdownComponent implements OnInit {
   }
 
   getSelectedItemsText(): string | undefined {
-    return this.selectedItems.length ? this.selectedItems.map(item => item.name).join(', ') : this.placeholder;
+    return this.selectedItems.length 
+      ? this.selectedItems.map(item => `${item.name} (${item.phoneCode})`).join(', ') 
+      : this.placeholder;
   }
 }

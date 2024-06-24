@@ -9,7 +9,7 @@
       </div>
       <div class="dropdown-item px-1" *ngFor="let item of filteredItems" (click)="toggleSelection(item)">
         <input type="checkbox" [checked]="isSelected(item)" *ngIf="multiSelect" />
-        ({{ item.code }}) {{ item.name }}
+        ({{ item.phoneCode}}) {{ item.name }}
       </div>
       <div class="dropdown-item text-center" *ngIf="loading">
         Loading...

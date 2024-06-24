@@ -3,6 +3,10 @@ import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms'
 import { UserService } from './service/user.service';
 import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DatePipe, formatDate } from '@angular/common';
+import { Country } from './interfaces/country.interface';
+import { Observable } from 'rxjs';
+import { DropdownConfig } from './interfaces/dropdown-config.interface';
+import { CountriesService } from './service/countries.service';
 
 @Component({
   selector: 'app-user-from',
@@ -13,12 +17,15 @@ export class UserFromComponent implements OnInit {
   userForm!: FormGroup;
   maritalStatuses = ['Single', 'Married', 'Divorced', 'Widowed'];
   genders = ['Male', 'Female'];
-  countryCodes = [{ code: '+20', country: 'EG' }, { code: '+966', country: 'SA' }];
+  countryCodes:Country[] = [];
   dob!: string | null;
   model!: NgbDateStruct;
   date!: { year: number; month: number };
 
-  constructor(private fb: FormBuilder, private userService: UserService, private datePipe: DatePipe) { }
+  page = 1;
+  pageSize = 10;
+
+  constructor(private fb: FormBuilder, private userService: UserService, private countriesServ: CountriesService) { }
 
 
   public resetForm() {
@@ -63,6 +70,8 @@ export class UserFromComponent implements OnInit {
       addressEn: ['', Validators.required],
       addressAr: ['', Validators.required]
     });
+
+    this.loadInitialCountries();
   }
   private CheckArLletters(control:FormControl){
     return this.userService.arabicValidator(control.value)
@@ -81,5 +90,19 @@ export class UserFromComponent implements OnInit {
   private formatDateObject(dateObj: { year: number, month: number, day: number }): string {
     const date = new Date(dateObj.year, dateObj.month - 1, dateObj.day); // -1 -> bcs months is 0 based indexs
     return formatDate(date, 'dd MMMM yyyy', 'en-US');
+  }
+
+  loadInitialCountries() {
+    this.loadMoreCountries(this.page, this.pageSize).subscribe(countries => this.countryCodes = countries);
+  }
+  
+  loadMoreCountries = (page: number, pageSize: number): Observable<Country[]> => {
+    // Simulate an API call
+    return this.countriesServ.getCountries(page,pageSize)
+  };
+
+  onSelectionChange(selectedCountries: Country[]) {
+    console.log('Selected countries:', selectedCountries);
+    // Handle selected countries logic here
   }
 }

@@ -7,7 +7,8 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="fullscreenModalLabel">User Form</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" (click)="resetForm()"></button>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+          (click)="resetForm()"></button>
       </div>
       <div class="modal-body">
         <form [formGroup]="userForm">
@@ -51,7 +52,8 @@
           <div class="d-flex flex-wrap mb-3">
             <div class="flex-fill me-2">
               <label for="firstNameAr" class="form-label">First Name (Arabic)</label>
-              <input type="text" id="firstNameAr" placeholder="accepts only AR letters" appArabicOnly class="form-control" formControlName="firstNameAr">
+              <input type="text" id="firstNameAr" placeholder="accepts only AR letters" appArabicOnly
+                class="form-control" formControlName="firstNameAr">
               <div *ngIf="userForm.get('firstNameAr')?.invalid && userForm.get('firstNameAr')?.touched"
                 class="text-danger">
                 First Name (Arabic) is required
@@ -59,7 +61,8 @@
             </div>
             <div class="flex-fill me-2">
               <label for="secondNameAr" class="form-label">Second Name (Arabic)</label>
-              <input type="text" id="secondNameAr" appArabicOnly class="form-control" placeholder="accepts only AR letters" formControlName="secondNameAr">
+              <input type="text" id="secondNameAr" appArabicOnly class="form-control"
+                placeholder="accepts only AR letters" formControlName="secondNameAr">
               <div *ngIf="userForm.get('secondNameAr')?.invalid && userForm.get('secondNameAr')?.touched"
                 class="text-danger">
                 Second Name (Arabic) is required
@@ -67,7 +70,8 @@
             </div>
             <div class="flex-fill me-2">
               <label for="thirdNameAr" class="form-label">Third Name (Arabic)</label>
-              <input type="text" id="thirdNameAr" appArabicOnly class="form-control" formControlName="thirdNameAr" placeholder="accepts only AR letters">
+              <input type="text" id="thirdNameAr" appArabicOnly class="form-control" formControlName="thirdNameAr"
+                placeholder="accepts only AR letters">
               <div *ngIf="userForm.get('thirdNameAr')?.invalid && userForm.get('thirdNameAr')?.touched"
                 class="text-danger">
                 Third Name (Arabic) is required
@@ -75,7 +79,8 @@
             </div>
             <div class="flex-fill">
               <label for="lastNameAr" class="form-label">Last Name (Arabic)</label>
-              <input type="text" id="lastNameAr" appArabicOnly class="form-control" placeholder="accepts only AR letters" formControlName="lastNameAr">
+              <input type="text" id="lastNameAr" appArabicOnly class="form-control"
+                placeholder="accepts only AR letters" formControlName="lastNameAr">
               <div *ngIf="userForm.get('lastNameAr')?.invalid && userForm.get('lastNameAr')?.touched"
                 class="text-danger">
                 Last Name (Arabic) is required
@@ -99,27 +104,33 @@
           <div class="d-flex mb-3">
             <div class="me-2">
               <label for="countryCode" class="form-label">Country Code</label>
-              <select id="countryCode" class="form-select" formControlName="countryCode">
+              <app-custom-dropdown [items]="countryCodes" [enableSearch]="true" [multiSelect]="false" [placeholder]="'Select country'"
+                [pageSize]="pageSize" [loadMoreData]="loadMoreCountries">
+              </app-custom-dropdown>
+              <!-- <select id="countryCode" class="form-select" formControlName="countryCode">
                 <option *ngFor="let code of countryCodes" [value]="code.code">{{ code.country }} ({{ code.code }})
                 </option>
               </select>
               <div *ngIf="userForm.get('countryCode')?.invalid && userForm.get('countryCode')?.touched"
                 class="text-danger">
                 Country Code is required
-              </div>
+              </div> -->
             </div>
 
             <div class="flex-fill">
               <label for="phoneNumber" class="form-label">Phone Number</label>
-              <input type="tel" id="phoneNumber" class="form-control" formControlName="phoneNumber" placeholder="only numberss allowed">
+              <input type="tel" id="phoneNumber" class="form-control" formControlName="phoneNumber"
+                placeholder="only numberss allowed">
               <div *ngIf="userForm.get('phoneNumber')?.invalid && userForm.get('phoneNumber')?.touched"
                 class="text-danger">
                 <div *ngIf="userForm.get('phoneNumber')?.errors?.['required']">Phone Number is required</div>
                 <div *ngIf="userForm.get('phoneNumber')?.errors?.['pattern']">Phone Number must contain only numbers
                 </div>
-                <div *ngIf="userForm.get('phoneNumber')?.errors?.['maxlength']">Phone Number must be 11 number length as max
+                <div *ngIf="userForm.get('phoneNumber')?.errors?.['maxlength']">Phone Number must be 11 number length as
+                  max
                 </div>
-                <div *ngIf="userForm.get('phoneNumber')?.errors?.['minlength']">Phone Number must be 10 number length as minimum
+                <div *ngIf="userForm.get('phoneNumber')?.errors?.['minlength']">Phone Number must be 10 number length as
+                  minimum
                 </div>
                 <div *ngIf="userForm.get('phoneNumber')?.errors?.['phoneNotUnique']">Phone Number is already taken
                 </div>
@@ -131,11 +142,12 @@
           <div class="mb-3">
             <label for="dateOfBirth" class="form-label">Date of Birth</label>
             <div class="input-group">
-              <input class="form-control" placeholder="dd Mmmm yyyy" formControlName="dateOfBirth" appDateFormat ngbDatepicker
-                #d="ngbDatepicker"/>
+              <input class="form-control" placeholder="dd Mmmm yyyy" formControlName="dateOfBirth" appDateFormat
+                ngbDatepicker #d="ngbDatepicker" />
               <button class="btn btn-outline-secondary bi bi-calendar3" (click)="d.toggle()" type="button"></button>
             </div>
-            <div *ngIf="userForm.get('dateOfBirth')?.invalid && userForm.get('dateOfBirth')?.touched" class="text-danger">
+            <div *ngIf="userForm.get('dateOfBirth')?.invalid && userForm.get('dateOfBirth')?.touched"
+              class="text-danger">
               Date of Birth is required
             </div>
           </div>
@@ -195,8 +207,9 @@
         </form>
       </div>
       <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()" >Close</button>
-        <button type="button" class="btn btn-primary" [disabled]="!userForm.valid"  (click)="onSubmit()" data-bs-dismiss="modal">Add User</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" (click)="resetForm()">Close</button>
+        <button type="button" class="btn btn-primary" [disabled]="!userForm.valid" (click)="onSubmit()"
+          data-bs-dismiss="modal">Add User</button>
       </div>
     </div>
   </div>

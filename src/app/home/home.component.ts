@@ -3,6 +3,9 @@ import { userCols } from 'src/assets/data/dumy-data';
 import { TableConfig } from '../table/interfaces/table-details.interface';
 import { UserService } from '../user-from/service/user.service';
 import { User } from '../user-from/interfaces/user.interface';
+import { Country } from '../user-from/interfaces/country.interface';
+import { CountriesService } from '../user-from/service/countries.service';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -10,7 +13,8 @@ import { User } from '../user-from/interfaces/user.interface';
   styleUrls: ['./home.component.scss'],
 })
 export class HomeComponent implements OnInit {
-  dataList:User[] = [];
+  dataList: User[] = [];
+  countryCodes: Country[] = [];
   tableConfigDetails!: TableConfig;
 
   constructor(private us: UserService) {

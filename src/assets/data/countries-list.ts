@@ -1,0 +1,36 @@
+import { Country } from "src/app/user-from/interfaces/country.interface";
+
+export const COUNTRIES: Country[] = [
+    { code: "AF", name: "Afghanistan" },
+    { code: "AL", name: "Albania" },
+    { code: "DZ", name: "Algeria" },
+    { code: "AR", name: "Argentina" },
+    { code: "AU", name: "Australia" },
+    { code: "AT", name: "Austria" },
+    { code: "BD", name: "Bangladesh" },
+    { code: "BE", name: "Belgium" },
+    { code: "BR", name: "Brazil" },
+    { code: "CA", name: "Canada" },
+    { code: "CL", name: "Chile" },
+    { code: "CN", name: "China" },
+    { code: "CO", name: "Colombia" },
+    { code: "HR", name: "Croatia" },
+    { code: "DK", name: "Denmark" },
+    { code: "EG", name: "Egypt" },
+    { code: "FR", name: "France" },
+    { code: "DE", name: "Germany" },
+    { code: "GH", name: "Ghana" },
+    { code: "IN", name: "India" },
+    { code: "ID", name: "Indonesia" },
+    { code: "IT", name: "Italy" },
+    { code: "JP", name: "Japan" },
+    { code: "KE", name: "Kenya" },
+    { code: "MY", name: "Malaysia" },
+    { code: "MX", name: "Mexico" },
+    { code: "MA", name: "Morocco" },
+    { code: "NG", name: "Nigeria" },
+    { code: "PK", name: "Pakistan" },
+    { code: "RU", name: "Russia" },
+    { code: "ZA", name: "South Africa" }
+  ];
+  

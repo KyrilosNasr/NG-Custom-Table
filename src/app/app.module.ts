@@ -12,6 +12,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DateFormatDirective } from './user-from/directives/date-format.directive';
 import { NgbDatepickerModule, NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { ArabicOnlyDirective } from './user-from/directives/arabic-only.directive';
+import { CustomDropdownComponent } from './user-from/custom-dropdown/custom-dropdown.component';
 
 @NgModule({
   declarations: [
@@ -19,7 +20,8 @@ import { ArabicOnlyDirective } from './user-from/directives/arabic-only.directiv
     HomeComponent,
     UserFromComponent,
     DateFormatDirective,
-    ArabicOnlyDirective
+    ArabicOnlyDirective,
+    CustomDropdownComponent
   ],
   imports: [
     BrowserModule,

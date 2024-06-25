@@ -104,17 +104,17 @@
           <div class="d-flex mb-3">
             <div class="me-2">
               <label for="countryCode" class="form-label">Country Code</label>
-              <app-custom-dropdown [items]="countryCodes" [enableSearch]="true" [multiSelect]="false" [placeholder]="'Select country'"
-                [pageSize]="pageSize" [loadMoreData]="loadMoreCountries">
+              <app-custom-dropdown formControlName="countryCode" [items]="countryCodes" [enableSearch]="false" [multiSelect]="true" [placeholder]="'Select country'"
+                [pageSize]="pageSize" [loadMoreData]="loadMoreCountries" (selectionChange)="loging($event)">
               </app-custom-dropdown>
-              <!-- <select id="countryCode" class="form-select" formControlName="countryCode">
-                <option *ngFor="let code of countryCodes" [value]="code.code">{{ code.country }} ({{ code.code }})
-                </option>
-              </select>
               <div *ngIf="userForm.get('countryCode')?.invalid && userForm.get('countryCode')?.touched"
                 class="text-danger">
                 Country Code is required
-              </div> -->
+              </div> 
+              <!-- <select id="countryCode" class="form-select" formControlName="countryCode">
+                <option *ngFor="let code of countryCodes" [value]="code.code">{{ code.country }} ({{ code.code }})
+                </option>
+              </select> -->
             </div>
 
             <div class="flex-fill">

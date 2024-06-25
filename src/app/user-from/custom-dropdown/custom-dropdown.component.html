@@ -1,11 +1,11 @@
 <div class="dropdown" [class.show]="isDropdownOpen">
-    <button class="btn dropdown-toggle" type="button" (click)="toggleDropdown()">
-      {{ getSelectedItemsText() }}
+    <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" (click)="toggleDropdown()">
+      {{ getSelectedText() }}
     </button>
     <div class="dropdown-menu px-2" [class.show]="isDropdownOpen">
       <div class="d-flex align-items-center gap-1">
         <input type="text" *ngIf="enableSearch" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm" />
-        <i class="bi bi-arrow-counterclockwise border p-1" (click)="reset()"></i>
+        <i *ngIf="enableSearch" class="bi bi-arrow-counterclockwise border p-1" (click)="reset()"></i>
       </div>
       <div class="dropdown-item px-1" *ngFor="let item of filteredItems" (click)="toggleSelection(item)">
         <input type="checkbox" [checked]="isSelected(item)" *ngIf="multiSelect" />

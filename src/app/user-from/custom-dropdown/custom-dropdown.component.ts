@@ -17,6 +17,7 @@ export class CustomDropdownComponent implements OnInit {
   @Input() loadMoreData!: (page: number, pageSize: number) => Observable<Country[]>;
 
   @Output() selectionChange = new EventEmitter<Country[]>();
+  @Output() dropdownBlur = new EventEmitter<void>();
 
   isDropdownOpen = false;
   searchTerm = '';
@@ -43,6 +44,7 @@ export class CustomDropdownComponent implements OnInit {
     if (this.isDropdownOpen) {
       this.onSearch();
     }
+    this.dropdownBlur.emit();
   }
 
   toggleSelection(item: Country) {
@@ -105,9 +107,14 @@ export class CustomDropdownComponent implements OnInit {
     }
   }
 
-  getSelectedItemsText(): string | undefined {
+  getSelectedText(): string | undefined {
     return this.selectedItems.length 
       ? this.selectedItems.map(item => `${item.name} (${item.phoneCode})`).join(', ') 
       : this.placeholder;
+  }
+  
+  setSelectedItems(items: Country[]): void {
+    this.selectedItems = items;
+    this.selectionChange.emit(this.selectedItems);
   }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { UserService } from './service/user.service';
 import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
@@ -7,13 +7,14 @@ import { Country } from './interfaces/country.interface';
 import { Observable } from 'rxjs';
 import { DropdownConfig } from './interfaces/dropdown-config.interface';
 import { CountriesService } from './service/countries.service';
+import { CustomDropdownComponent } from './custom-dropdown/custom-dropdown.component';
 
 @Component({
   selector: 'app-user-from',
   templateUrl: './user-from.component.html',
   styleUrls: ['./user-from.component.scss']
 })
-export class UserFromComponent implements OnInit {
+export class UserFromComponent implements OnInit , AfterViewInit {
   userForm!: FormGroup;
   maritalStatuses = ['Single', 'Married', 'Divorced', 'Widowed'];
   genders = ['Male', 'Female'];
@@ -24,14 +25,19 @@ export class UserFromComponent implements OnInit {
 
   page = 1;
   pageSize = 10;
-
+  
+  @ViewChild(CustomDropdownComponent) customDropdown!: CustomDropdownComponent;
   constructor(private fb: FormBuilder, private userService: UserService, private countriesServ: CountriesService) { }
 
 
   public resetForm() {
     this.userForm.reset();
   }
+ loging(contry:Country[]){
+  const selectedCountries = this.customDropdown.getSelectedText();
+    console.log('Selected Countries:', contry);
 
+ }
   public onSubmit() {
     if (this.userForm.valid) {
       const formValue = { ...this.userForm.value };
@@ -73,6 +79,20 @@ export class UserFromComponent implements OnInit {
 
     this.loadInitialCountries();
   }
+  
+  ngAfterViewInit() {
+    this.customDropdown.selectionChange.subscribe(selectedItems => {
+      this.userForm.get('countryCode')?.setValue(selectedItems);
+      this.userForm.get('countryCode')?.markAsTouched();
+      this.userForm.get('countryCode')?.updateValueAndValidity();
+    });
+
+    this.customDropdown.dropdownBlur.subscribe(() => {
+      this.userForm.get('countryCode')?.markAsTouched();
+      this.userForm.get('countryCode')?.updateValueAndValidity();
+    });
+
+  }
   private CheckArLletters(control:FormControl){
     return this.userService.arabicValidator(control.value)
   }
@@ -102,7 +122,10 @@ export class UserFromComponent implements OnInit {
   };
 
   onSelectionChange(selectedCountries: Country[]) {
-    console.log('Selected countries:', selectedCountries);
+    // console.log('Selected countries:', selectedCountries);
+    let val = this.userForm.get('countryCode')?.value
+    console.log(val);
+    
     // Handle selected countries logic here
   }
 }

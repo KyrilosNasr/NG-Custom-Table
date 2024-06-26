@@ -80,27 +80,6 @@ export let ticketsList: TicketDetails[] = [
   }
 ];
 
-export const users:User[] = [
-  {
-    "firstNameEn": "as",
-    "secondNameEn": "as",
-    "thirdNameEn": "as",
-    "lastNameEn": "as",
-    "firstNameAr": "da",
-    "secondNameAr": "da",
-    "thirdNameAr": "da",
-    "lastNameAr": "da",
-    "email": "a@a.co",
-    "countryCode": "+20",
-    "phoneNumber": 12323123,
-    "dateOfBirth": '2 june 2024',
-    "nationalId": 1234567,
-    "maritalStatus": "Single",
-    "gender": "Male",
-    "addressEn": "asd",
-    "addressAr": "asd"
-}
-]
 export const columns: TableColumnDetails[] =[
   { name: 'Number', rowDetail:'ticketNo', sortable: false, draggable: true },
   { name: 'title',  rowDetail:'title',sortable: true, draggable: true },

@@ -1,3 +1,5 @@
+import { Country } from "./country.interface";
+
 export interface User {
     firstNameEn: string;
     secondNameEn: string;

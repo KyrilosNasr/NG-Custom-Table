@@ -4,13 +4,16 @@
   </button>
   <div #dropdownMenu class="dropdown-menu px-2" [class.show]="isDropdownOpen">
     <div class="d-flex align-items-center gap-1">
-      <input type="text" *ngIf="enableSearch" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" />
+      <input type="text" *ngIf="enableSearch" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearch()" />
 
-      <button *ngIf="enableSearch" (click)="reset($event)" class="btn bg-white ms-2" [disabled]="selectedItems.length === 0 && searchTerm === ''">
+      <button *ngIf="enableSearch" (click)="reset($event)" class="btn bg-white ms-2"
+        [disabled]="selectedItems.length === 0 && searchTerm === ''">
         <i class="bi bi-arrow-counterclockwise"></i>
       </button>
     </div>
-    <div class="dropdown-item px-1 d-inline-flex align-items-center justify-content-start gap-2" *ngFor="let item of filteredItems" (click)="toggleSelection(item)">
+    <div class="dropdown-item px-1 d-inline-flex align-items-center justify-content-start gap-2"
+      *ngFor="let item of filteredItems" (click)="toggleSelection(item)">
       <input class="check" type="checkbox" [checked]="isSelected(item)" *ngIf="multiSelect" />
       ({{ item.phoneCode }}) {{ item.name }}
     </div>

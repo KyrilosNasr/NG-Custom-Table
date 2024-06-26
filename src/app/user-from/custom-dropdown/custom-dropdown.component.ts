@@ -30,6 +30,51 @@ export class CustomDropdownComponent implements OnInit, AfterViewInit, OnDestroy
 
   private searchSubject = new BehaviorSubject<string>('');
 
+
+  public getSelectedText(): string | undefined {
+    return this.selectedItems.length
+      ? this.selectedItems.map(item => `${item.name} (${item.phoneCode})`).join(', ')
+      : this.placeholder;
+  }
+
+  public onSearch() {
+    this.searchSubject.next(this.searchTerm);
+  }
+
+  public reset(event: Event) {
+    event.stopPropagation();
+    this.selectedItems = [];
+    this.searchTerm = '';
+    this.onSearch();
+  }
+
+  public toggleSelection(item: Country) {
+    if (this.multiSelect) {
+      const index = this.selectedItems.indexOf(item);
+      if (index >= 0) {
+        this.selectedItems.splice(index, 1);
+      } else {
+        this.selectedItems.push(item);
+      }
+    } else {
+      this.selectedItems = [item];
+      this.isDropdownOpen = false;
+    }
+    this.selectionChange.emit(this.selectedItems);
+  }
+
+  public isSelected(item: Country): boolean {
+    return this.selectedItems.indexOf(item) >= 0;
+  }
+
+  public toggleDropdown() {
+    this.isDropdownOpen = !this.isDropdownOpen;
+    if (this.isDropdownOpen) {
+      this.onSearch();
+    }
+    this.dropdownBlur.emit();
+  }
+
   ngOnInit() {
     this.loadInitialItems();
     this.searchSubject.pipe(
@@ -48,45 +93,14 @@ export class CustomDropdownComponent implements OnInit, AfterViewInit, OnDestroy
     }
   }
 
-  toggleDropdown() {
-    this.isDropdownOpen = !this.isDropdownOpen;
-    if (this.isDropdownOpen) {
-      this.onSearch();
-    }
-    this.dropdownBlur.emit();
-  }
-
-  toggleSelection(item: Country) {
-    if (this.multiSelect) {
-      const index = this.selectedItems.indexOf(item);
-      if (index >= 0) {
-        this.selectedItems.splice(index, 1);
-      } else {
-        this.selectedItems.push(item);
-      }
-    } else {
-      this.selectedItems = [item];
-      this.isDropdownOpen = false;
-    }
-    this.selectionChange.emit(this.selectedItems);
-  }
-
-  isSelected(item: Country): boolean {
-    return this.selectedItems.indexOf(item) >= 0;
-  }
-
-  onSearch() {
-    this.searchSubject.next(this.searchTerm);
-  }
-
-  loadInitialItems() {
+  private loadInitialItems() {
     this.loadItems().subscribe(items => {
       this.items = items;
       this.filteredItems = this.items;
     });
   }
 
-  loadItems(): Observable<Country[]> {
+  private loadItems(): Observable<Country[]> {
     this.loading = true;
     return this.loadMoreData(this.page, this.pageSize).pipe(
       tap(() => {
@@ -96,17 +110,17 @@ export class CustomDropdownComponent implements OnInit, AfterViewInit, OnDestroy
     );
   }
 
-  searchItems(term: string): Observable<Country[]> {
+  private searchItems(term: string): Observable<Country[]> {
     if (!term.trim()) {
       return of(this.items);
     }
-  
+
     const lowerCaseTerm = term.toLowerCase();
-    const matchingItems = this.items.filter(item => 
-      item.name.toLowerCase().includes(lowerCaseTerm) || 
+    const matchingItems = this.items.filter(item =>
+      item.name.toLowerCase().includes(lowerCaseTerm) ||
       item.phoneCode.includes(lowerCaseTerm)
     );
-  
+
     if (matchingItems.length > 0) {
       return of(matchingItems);
     } else {
@@ -117,8 +131,8 @@ export class CustomDropdownComponent implements OnInit, AfterViewInit, OnDestroy
           this.page++;
         }),
         switchMap(() => {
-          const updatedMatchingItems = this.items.filter(item => 
-            item.name.toLowerCase().includes(lowerCaseTerm) || 
+          const updatedMatchingItems = this.items.filter(item =>
+            item.name.toLowerCase().includes(lowerCaseTerm) ||
             item.phoneCode.includes(lowerCaseTerm)
           );
           return of(updatedMatchingItems);
@@ -127,9 +141,9 @@ export class CustomDropdownComponent implements OnInit, AfterViewInit, OnDestroy
       );
     }
   }
-  
 
-  onScroll() {
+
+  private onScroll() {
     const dropdownMenu = this.dropdownMenu.nativeElement;
     const bottomOfMenu = dropdownMenu.scrollHeight - dropdownMenu.scrollTop <= dropdownMenu.clientHeight;
     if (this.isDropdownOpen && !this.loading && bottomOfMenu) {
@@ -138,23 +152,5 @@ export class CustomDropdownComponent implements OnInit, AfterViewInit, OnDestroy
         this.filteredItems = this.items;
       });
     }
-  }
-
-  getSelectedText(): string | undefined {
-    return this.selectedItems.length 
-      ? this.selectedItems.map(item => `${item.name} (${item.phoneCode})`).join(', ') 
-      : this.placeholder;
-  }
-
-  setSelectedItems(items: Country[]): void {
-    this.selectedItems = items;
-    this.selectionChange.emit(this.selectedItems);
-  }
-
-  reset(event: Event) {
-    event.stopPropagation();
-    this.selectedItems = [];
-    this.searchTerm = '';
-    this.onSearch();
   }
 }

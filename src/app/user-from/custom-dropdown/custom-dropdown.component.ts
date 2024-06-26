@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { Observable, BehaviorSubject, debounceTime, switchMap, tap, of, catchError } from 'rxjs';
+import { Observable, BehaviorSubject, debounceTime, switchMap, tap, of, catchError, Subject, takeUntil } from 'rxjs';
 import { Country } from '../interfaces/country.interface';
 import { DropdownConfig } from '../interfaces/dropdown-config.interface';
 
@@ -74,23 +74,17 @@ export class CustomDropdownComponent implements OnInit, AfterViewInit, OnDestroy
     }
     this.dropdownBlur.emit();
   }
-
+  private destroy$ = new Subject<void>();
+  
   ngOnInit() {
-    this.loadInitialItems();
     this.searchSubject.pipe(
       debounceTime(300),
-      switchMap(term => this.searchItems(term))
+      switchMap(term => this.searchItems(term)),
+      takeUntil(this.destroy$) // Unsubscribe on destroy
     ).subscribe(items => this.filteredItems = items);
   }
-
   ngAfterViewInit() {
     this.dropdownMenu.nativeElement.addEventListener('scroll', this.onScroll.bind(this));
-  }
-
-  ngOnDestroy() {
-    if (this.dropdownMenu) {
-      this.dropdownMenu.nativeElement.removeEventListener('scroll', this.onScroll.bind(this));
-    }
   }
 
   private loadInitialItems() {
@@ -151,6 +145,14 @@ export class CustomDropdownComponent implements OnInit, AfterViewInit, OnDestroy
         this.items = [...this.items, ...newItems];
         this.filteredItems = this.items;
       });
+    }
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+    if (this.dropdownMenu) {
+      this.dropdownMenu.nativeElement.removeEventListener('scroll', this.onScroll.bind(this));
     }
   }
 }

@@ -4,7 +4,7 @@
   </button>
   <div #dropdownMenu class="dropdown-menu px-2" [class.show]="isDropdownOpen">
     <div class="d-flex align-items-center gap-1">
-      <input type="text" *ngIf="enableSearch" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm" />
+      <input type="text" *ngIf="enableSearch" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm" (ngModelChange)="onSearch()" />
 
       <button *ngIf="enableSearch" (click)="reset($event)" class="btn bg-white ms-2" [disabled]="selectedItems.length === 0 && searchTerm === ''">
         <i class="bi bi-arrow-counterclockwise"></i>

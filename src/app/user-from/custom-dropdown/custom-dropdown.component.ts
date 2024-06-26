@@ -1,5 +1,5 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { Observable, BehaviorSubject, debounceTime, switchMap, tap, of } from 'rxjs';
+import { Observable, BehaviorSubject, debounceTime, switchMap, tap, of, catchError } from 'rxjs';
 import { Country } from '../interfaces/country.interface';
 import { DropdownConfig } from '../interfaces/dropdown-config.interface';
 
@@ -100,8 +100,34 @@ export class CustomDropdownComponent implements OnInit, AfterViewInit, OnDestroy
     if (!term.trim()) {
       return of(this.items);
     }
-    return of(this.items.filter(item => item.name.toLowerCase().includes(term.toLowerCase())));
+  
+    const lowerCaseTerm = term.toLowerCase();
+    const matchingItems = this.items.filter(item => 
+      item.name.toLowerCase().includes(lowerCaseTerm) || 
+      item.phoneCode.includes(lowerCaseTerm)
+    );
+  
+    if (matchingItems.length > 0) {
+      return of(matchingItems);
+    } else {
+      // Load more data only if no matching items found in the current list
+      return this.loadMoreData(this.page, this.pageSize).pipe(
+        tap(newItems => {
+          this.items = [...this.items, ...newItems];
+          this.page++;
+        }),
+        switchMap(() => {
+          const updatedMatchingItems = this.items.filter(item => 
+            item.name.toLowerCase().includes(lowerCaseTerm) || 
+            item.phoneCode.includes(lowerCaseTerm)
+          );
+          return of(updatedMatchingItems);
+        }),
+        catchError(() => of([]))
+      );
+    }
   }
+  
 
   onScroll() {
     const dropdownMenu = this.dropdownMenu.nativeElement;

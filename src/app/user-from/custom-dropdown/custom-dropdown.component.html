@@ -1,19 +1,21 @@
 <div class="dropdown" [class.show]="isDropdownOpen">
-    <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" (click)="toggleDropdown()">
-      {{ getSelectedText() }}
-    </button>
-    <div #dropdownMenu class="dropdown-menu px-2" [class.show]="isDropdownOpen">
-      <div class="d-flex align-items-center gap-1">
-        <input type="text" *ngIf="enableSearch" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm" />
-        <i *ngIf="enableSearch" class="bi bi-arrow-counterclockwise border p-1" (click)="reset()"></i>
-      </div>
-      <div class="dropdown-item px-1" *ngFor="let item of filteredItems" (click)="toggleSelection(item)">
-        <input type="checkbox" [checked]="isSelected(item)" *ngIf="multiSelect" />
-        ({{ item.phoneCode}}) {{ item.name }}
-      </div>
-      <div class="dropdown-item text-center" *ngIf="loading">
-        Loading...
-      </div>
+  <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" (click)="toggleDropdown()">
+    {{ getSelectedText() }}
+  </button>
+  <div #dropdownMenu class="dropdown-menu px-2" [class.show]="isDropdownOpen">
+    <div class="d-flex align-items-center gap-1">
+      <input type="text" *ngIf="enableSearch" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm" />
+
+      <button *ngIf="enableSearch" (click)="reset($event)" class="btn bg-white ms-2" [disabled]="selectedItems.length === 0 && searchTerm === ''">
+        <i class="bi bi-arrow-counterclockwise"></i>
+      </button>
+    </div>
+    <div class="dropdown-item px-1 d-inline-flex align-items-center justify-content-start gap-2" *ngFor="let item of filteredItems" (click)="toggleSelection(item)">
+      <input class="check" type="checkbox" [checked]="isSelected(item)" *ngIf="multiSelect" />
+      ({{ item.phoneCode }}) {{ item.name }}
+    </div>
+    <div class="dropdown-item text-center" *ngIf="loading">
+      Loading...
     </div>
   </div>
-  
+</div>

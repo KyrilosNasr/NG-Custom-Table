@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Observable, BehaviorSubject, debounceTime, switchMap, tap, of } from 'rxjs';
 import { Country } from '../interfaces/country.interface';
 import { DropdownConfig } from '../interfaces/dropdown-config.interface';
@@ -8,7 +8,7 @@ import { DropdownConfig } from '../interfaces/dropdown-config.interface';
   templateUrl: './custom-dropdown.component.html',
   styleUrls: ['./custom-dropdown.component.scss']
 })
-export class CustomDropdownComponent implements OnInit, AfterViewInit {
+export class CustomDropdownComponent implements OnInit, AfterViewInit, OnDestroy {
   @Input() items: Country[] = [];
   @Input() multiSelect = false;
   @Input() enableSearch = false;
@@ -29,10 +29,6 @@ export class CustomDropdownComponent implements OnInit, AfterViewInit {
   page = 1;
 
   private searchSubject = new BehaviorSubject<string>('');
-
-  public reset() {
-    this.selectedItems = [];
-  }
 
   ngOnInit() {
     this.loadInitialItems();
@@ -127,5 +123,12 @@ export class CustomDropdownComponent implements OnInit, AfterViewInit {
   setSelectedItems(items: Country[]): void {
     this.selectedItems = items;
     this.selectionChange.emit(this.selectedItems);
+  }
+
+  reset(event: Event) {
+    event.stopPropagation();
+    this.selectedItems = [];
+    this.searchTerm = '';
+    this.onSearch();
   }
 }

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, HostListener, Input, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, HostListener, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Observable, BehaviorSubject, debounceTime, switchMap, tap, of } from 'rxjs';
 import { Country } from '../interfaces/country.interface';
 import { DropdownConfig } from '../interfaces/dropdown-config.interface';
@@ -8,8 +8,8 @@ import { DropdownConfig } from '../interfaces/dropdown-config.interface';
   templateUrl: './custom-dropdown.component.html',
   styleUrls: ['./custom-dropdown.component.scss']
 })
-export class CustomDropdownComponent implements OnInit {
-  @Input() items:Country[] = [];
+export class CustomDropdownComponent implements OnInit, AfterViewInit {
+  @Input() items: Country[] = [];
   @Input() multiSelect = false;
   @Input() enableSearch = false;
   @Input() placeholder = '';
@@ -18,6 +18,8 @@ export class CustomDropdownComponent implements OnInit {
 
   @Output() selectionChange = new EventEmitter<Country[]>();
   @Output() dropdownBlur = new EventEmitter<void>();
+
+  @ViewChild('dropdownMenu') dropdownMenu!: ElementRef;
 
   isDropdownOpen = false;
   searchTerm = '';
@@ -28,15 +30,26 @@ export class CustomDropdownComponent implements OnInit {
 
   private searchSubject = new BehaviorSubject<string>('');
 
-  public reset(){
-    this.selectedItems = []
+  public reset() {
+    this.selectedItems = [];
   }
+
   ngOnInit() {
     this.loadInitialItems();
     this.searchSubject.pipe(
       debounceTime(300),
       switchMap(term => this.searchItems(term))
     ).subscribe(items => this.filteredItems = items);
+  }
+
+  ngAfterViewInit() {
+    this.dropdownMenu.nativeElement.addEventListener('scroll', this.onScroll.bind(this));
+  }
+
+  ngOnDestroy() {
+    if (this.dropdownMenu) {
+      this.dropdownMenu.nativeElement.removeEventListener('scroll', this.onScroll.bind(this));
+    }
   }
 
   toggleDropdown() {
@@ -72,7 +85,7 @@ export class CustomDropdownComponent implements OnInit {
 
   loadInitialItems() {
     this.loadItems().subscribe(items => {
-      this.items = items; // Assuming `loadItems` updates `config.items`
+      this.items = items;
       this.filteredItems = this.items;
     });
   }
@@ -94,16 +107,14 @@ export class CustomDropdownComponent implements OnInit {
     return of(this.items.filter(item => item.name.toLowerCase().includes(term.toLowerCase())));
   }
 
-  @HostListener('window:scroll', ['$event'])
-  onScroll(_event: MouseEvent) {
-    if (this.isDropdownOpen && !this.loading) {
-      const bottomOfWindow = window.innerHeight + window.scrollY >= document.documentElement.offsetHeight;
-      if (bottomOfWindow) {
-        this.loadItems().subscribe(newItems => {
-          this.items = [...this.items, ...newItems]; // Assuming `loadItems` updates `config.items`
-          this.filteredItems = this.items;
-        });
-      }
+  onScroll() {
+    const dropdownMenu = this.dropdownMenu.nativeElement;
+    const bottomOfMenu = dropdownMenu.scrollHeight - dropdownMenu.scrollTop <= dropdownMenu.clientHeight;
+    if (this.isDropdownOpen && !this.loading && bottomOfMenu) {
+      this.loadItems().subscribe(newItems => {
+        this.items = [...this.items, ...newItems];
+        this.filteredItems = this.items;
+      });
     }
   }
 
@@ -112,7 +123,7 @@ export class CustomDropdownComponent implements OnInit {
       ? this.selectedItems.map(item => `${item.name} (${item.phoneCode})`).join(', ') 
       : this.placeholder;
   }
-  
+
   setSelectedItems(items: Country[]): void {
     this.selectedItems = items;
     this.selectionChange.emit(this.selectedItems);

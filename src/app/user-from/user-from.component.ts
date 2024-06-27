@@ -4,7 +4,7 @@ import { UserService } from './service/user.service';
 import { NgbDateStruct } from '@ng-bootstrap/ng-bootstrap';
 import { DatePipe, formatDate } from '@angular/common';
 import { Country } from './interfaces/country.interface';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { DropdownConfig } from './interfaces/dropdown-config.interface';
 import { CountriesService } from './service/countries.service';
 import { CustomDropdownComponent } from './custom-dropdown/custom-dropdown.component';
@@ -19,6 +19,7 @@ export class UserFromComponent implements OnInit, AfterViewInit {
   maritalStatuses = ['Single', 'Married', 'Divorced', 'Widowed'];
   genders = ['Male', 'Female'];
   countryCodes: Country[] = [];
+  totalCountries = 0;
   dob!: string | null;
   model!: NgbDateStruct;
   date!: { year: number; month: number };
@@ -47,9 +48,6 @@ export class UserFromComponent implements OnInit, AfterViewInit {
     }
   }
 
-  public loadMoreCountries = (page: number, pageSize: number): Observable<Country[]> => {
-    return this.countriesServ.getCountries(page, pageSize)
-  };
 
   ngOnInit(): void {
     this.userForm = this.fb.group({
@@ -57,10 +55,10 @@ export class UserFromComponent implements OnInit, AfterViewInit {
       secondNameEn: ['', Validators.required],
       thirdNameEn: ['', Validators.required],
       lastNameEn: ['', Validators.required],
-      firstNameAr: ['', [Validators.required, this.CheckArLletters.bind(this)]],
-      secondNameAr: ['', [Validators.required, this.CheckArLletters.bind(this)]],
-      thirdNameAr: ['', [Validators.required, this.CheckArLletters.bind(this)]],
-      lastNameAr: ['', [Validators.required, this.CheckArLletters.bind(this)]],
+      firstNameAr: ['', [Validators.required, this.checkArLetters.bind(this)]],
+      secondNameAr: ['', [Validators.required, this.checkArLetters.bind(this)]],
+      thirdNameAr: ['', [Validators.required, this.checkArLetters.bind(this)]],
+      lastNameAr: ['', [Validators.required, this.checkArLetters.bind(this)]],
       email: ['', [
         Validators.required,
         Validators.email,
@@ -77,7 +75,7 @@ export class UserFromComponent implements OnInit, AfterViewInit {
       addressAr: ['', Validators.required]
     });
 
-    this.loadInitialCountries();
+    this.getAllCountries();
   }
 
   ngAfterViewInit() {
@@ -93,26 +91,31 @@ export class UserFromComponent implements OnInit, AfterViewInit {
       this.userForm.get('countryCode')?.updateValueAndValidity();
     });
   }
-  private CheckArLletters(control: FormControl) {
-    return this.userService.arabicValidator(control.value)
+
+  private checkArLetters(control: FormControl) {
+    return this.userService.arabicValidator(control.value);
   }
+
   private emailUniqueValidator(control: FormControl) {
-    return this.userService.isEmailUnique(control.value)
+    return this.userService.isEmailUnique(control.value);
   }
 
   private phoneNumberUniqueValidator(control: FormControl) {
-    return this.userService.isPhoneNumberUnique(control.value)
+    return this.userService.isPhoneNumberUnique(control.value);
   }
 
   private nationalIdUniqueValidator(control: FormControl) {
-    return this.userService.isNationalIdUnique(control.value)
+    return this.userService.isNationalIdUnique(control.value);
   }
+
   private formatDateObject(dateObj: { year: number, month: number, day: number }): string {
-    const date = new Date(dateObj.year, dateObj.month - 1, dateObj.day); // -1 -> bcs months is 0 based indexs
+    const date = new Date(dateObj.year, dateObj.month - 1, dateObj.day); // -1 because months are 0-based
     return formatDate(date, 'dd MMMM yyyy', 'en-US');
   }
 
-  private loadInitialCountries() {
-    this.loadMoreCountries(this.page, this.pageSize).subscribe(countries => this.countryCodes = countries);
+  private getAllCountries(){
+    return this.countriesServ.getCountries().subscribe((data)=> {
+      this.countryCodes = data      
+    })
   }
 }

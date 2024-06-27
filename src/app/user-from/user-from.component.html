@@ -104,8 +104,8 @@
           <div class="d-flex mb-3">
             <div class="me-2">
               <label for="countryCode" class="form-label">Country Code</label>
-              <app-custom-dropdown formControlName="countryCode" [items]="countryCodes" [enableSearch]="true" [multiSelect]="true" [placeholder]="'Select country'"
-                [pageSize]="pageSize" [loadMoreData]="loadMoreCountries">
+              <app-custom-dropdown formControlName="countryCode" [items]="countryCodes" [enableSearch]="true"
+                [multiSelect]="true" [placeholder]="'Select country'" [pageSize]="pageSize" [display]="'phoneCode'">
               </app-custom-dropdown>
               <div *ngIf="userForm.get('countryCode')?.invalid && userForm.get('countryCode')?.touched"
                 class="text-danger">

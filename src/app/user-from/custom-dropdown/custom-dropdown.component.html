@@ -2,6 +2,7 @@
   <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" (click)="toggleDropdown()">
     {{ getSelectedText() }}
   </button>
+  
   <div #dropdownMenu class="dropdown-menu px-2" [class.show]="isDropdownOpen">
     <div class="d-flex align-items-center gap-1">
       <input type="text" *ngIf="enableSearch" class="form-control" placeholder="Search..." [(ngModel)]="searchTerm"
